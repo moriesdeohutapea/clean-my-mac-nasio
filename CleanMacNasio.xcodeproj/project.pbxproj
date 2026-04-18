@@ -403,6 +403,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = CleanMacNasio;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -411,7 +412,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasio;
 				PRODUCT_MODULE_NAME = CleanMacNasio;
-				INFOPLIST_KEY_CFBundleDisplayName = CleanMacNasio;
 				PRODUCT_NAME = CleanMacNasio;
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -431,6 +431,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = CleanMacNasio;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -439,7 +440,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasio;
 				PRODUCT_MODULE_NAME = CleanMacNasio;
-				INFOPLIST_KEY_CFBundleDisplayName = CleanMacNasio;
 				PRODUCT_NAME = CleanMacNasio;
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;

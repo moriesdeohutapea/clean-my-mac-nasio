@@ -143,6 +143,10 @@ struct ContentView: View {
                             onRemove: viewModel.removeExcludedPath
                         )
 
+                        SectionTitle(title: "About", subtitle: "Informasi aplikasi")
+
+                        AboutAppPanel()
+
                         if !viewModel.logMessage.isEmpty || viewModel.isBusy {
                             StatusPanel(
                                 message: viewModel.logMessage,

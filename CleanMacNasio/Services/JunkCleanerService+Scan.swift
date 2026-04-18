@@ -34,7 +34,7 @@ extension JunkCleanerService {
         var totalSize: UInt64 = 0
         var totalFiles = 0
         var excludedItemsCount = 0
-        var itemRows: [(url: URL, metrics: FileUtils.ItemMetrics)] = []
+        var previewRows: [JunkPreviewItem] = []
         var errors: [String] = []
 
         for directory in directories {
@@ -54,19 +54,16 @@ extension JunkCleanerService {
                     let metrics = FileUtils.itemMetrics(at: child)
                     totalSize += metrics.totalSize
                     totalFiles += metrics.fileCount
-                    itemRows.append((url: child, metrics: metrics))
+                    updateTopPreviewRows(
+                        &previewRows,
+                        item: JunkPreviewItem(path: child.path, size: metrics.totalSize),
+                        limit: 5
+                    )
                 }
             } catch {
                 errors.append("\(directory.path): \(error.localizedDescription)")
             }
         }
-
-        let preview = itemRows
-            .sorted { $0.metrics.totalSize > $1.metrics.totalSize }
-            .prefix(5)
-            .map { row in
-                JunkPreviewItem(path: row.url.path, size: row.metrics.totalSize)
-            }
 
         return JunkScanEntry(
             location: location,
@@ -74,7 +71,7 @@ extension JunkCleanerService {
             totalSize: totalSize,
             fileCount: totalFiles,
             errorMessage: errors.isEmpty ? nil : errors.joined(separator: "\n"),
-            previewItems: Array(preview),
+            previewItems: previewRows,
             excludedItemsCount: excludedItemsCount
         )
     }
@@ -168,5 +165,14 @@ extension JunkCleanerService {
 
     static func looksLikeGradleVersion(_ value: String) -> Bool {
         value.range(of: #"^[0-9]+(\.[0-9A-Za-z-]+)+$"#, options: .regularExpression) != nil
+    }
+
+    private static func updateTopPreviewRows(_ rows: inout [JunkPreviewItem], item: JunkPreviewItem, limit: Int) {
+        guard item.size > 0 else { return }
+        rows.append(item)
+        rows.sort { $0.size > $1.size }
+        if rows.count > limit {
+            rows.removeSubrange(limit...)
+        }
     }
 }

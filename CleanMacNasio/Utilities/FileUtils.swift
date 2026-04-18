@@ -9,6 +9,11 @@ import Foundation
 
 struct FileUtils {
     static let fileManager = FileManager.default
+    private static let byteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter
+    }()
 
     struct FolderMetrics {
         let totalSize: UInt64
@@ -44,9 +49,7 @@ struct FileUtils {
                     totalSize += UInt64(resourceValues.fileSize ?? 0)
                     fileCount += 1
                 }
-            } catch {
-                print("⚠️ Error reading file size for \(fileURL): \(error)")
-            }
+            } catch {}
         }
 
         return FolderMetrics(totalSize: totalSize, fileCount: fileCount)
@@ -75,17 +78,13 @@ struct FileUtils {
                 let folder = folderMetrics(at: url)
                 return ItemMetrics(totalSize: folder.totalSize, fileCount: folder.fileCount)
             }
-        } catch {
-            print("⚠️ Error reading item size for \(url): \(error)")
-        }
+        } catch {}
 
         return ItemMetrics(totalSize: 0, fileCount: 0)
     }
 
     /// Format byte ke string human readable (KB/MB/GB)
     static func formatBytes(_ bytes: UInt64) -> String {
-        let formatter = ByteCountFormatter()
-        formatter.countStyle = .file
-        return formatter.string(fromByteCount: Int64(bytes))
+        byteFormatter.string(fromByteCount: Int64(bytes))
     }
 }

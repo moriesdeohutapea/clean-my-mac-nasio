@@ -217,7 +217,25 @@ struct JunkCleanSummary {
 
 protocol JunkCleaningServicing: Sendable {
     func scan(locations: [JunkLocation], homeDirectory: URL, excludedPaths: Set<String>) -> [JunkScanEntry]
+    func scan(
+        locations: [JunkLocation],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry]
     func clean(entries: [JunkScanEntry], excludedPaths: Set<String>) -> JunkCleanSummary
+}
+
+extension JunkCleaningServicing {
+    func scan(
+        locations: [JunkLocation],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry] {
+        guard !shouldCancel() else { return [] }
+        return scan(locations: locations, homeDirectory: homeDirectory, excludedPaths: excludedPaths)
+    }
 }
 
 struct JunkCleanerService {
@@ -306,6 +324,20 @@ struct JunkCleanerService {
 extension JunkCleanerService: JunkCleaningServicing {
     func scan(locations: [JunkLocation], homeDirectory: URL, excludedPaths: Set<String>) -> [JunkScanEntry] {
         Self.scan(locations: locations, homeDirectory: homeDirectory, excludedPaths: excludedPaths)
+    }
+
+    func scan(
+        locations: [JunkLocation],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry] {
+        Self.scan(
+            locations: locations,
+            homeDirectory: homeDirectory,
+            excludedPaths: excludedPaths,
+            shouldCancel: shouldCancel
+        )
     }
 
     func clean(entries: [JunkScanEntry], excludedPaths: Set<String>) -> JunkCleanSummary {

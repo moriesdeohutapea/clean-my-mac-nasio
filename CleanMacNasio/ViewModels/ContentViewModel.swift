@@ -202,7 +202,10 @@ final class ContentViewModel: ObservableObject {
                     let stepEntries = service.scan(
                         locations: [location],
                         homeDirectory: targetHomeDirectory,
-                        excludedPaths: currentExcludedPaths
+                        excludedPaths: currentExcludedPaths,
+                        shouldCancel: { [weak self] in
+                            self?.shouldCancelScan() ?? false
+                        }
                     )
                     scannedEntries.append(contentsOf: stepEntries)
 

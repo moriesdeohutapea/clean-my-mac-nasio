@@ -2,34 +2,56 @@ import Foundation
 
 extension JunkCleanerService {
     static func scan(locations: [JunkLocation], homeDirectory: URL, excludedPaths: Set<String>) -> [JunkScanEntry] {
+        scan(
+            locations: locations,
+            homeDirectory: homeDirectory,
+            excludedPaths: excludedPaths,
+            shouldCancel: { false }
+        )
+    }
+
+    static func scan(
+        locations: [JunkLocation],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry] {
         let protectedRoots = protectedRootPaths(homeDirectory: homeDirectory)
-        return locations.flatMap { location in
+        var allEntries: [JunkScanEntry] = []
+
+        for location in locations {
+            if shouldCancel() { break }
             switch location {
             case .gradleCaches:
-                return buildGradleScanEntries(
+                allEntries.append(contentsOf: buildGradleScanEntries(
                     homeDirectory: homeDirectory,
                     excludedPaths: excludedPaths,
-                    protectedRootPaths: protectedRoots
-                )
+                    protectedRootPaths: protectedRoots,
+                    shouldCancel: shouldCancel
+                ))
             default:
                 let directories = location.resolveDirectories(homeDirectory: homeDirectory)
-                return [
+                allEntries.append(
                     buildScanEntry(
                         location: location,
                         directories: directories,
                         excludedPaths: excludedPaths,
-                        protectedRootPaths: protectedRoots
+                        protectedRootPaths: protectedRoots,
+                        shouldCancel: shouldCancel
                     )
-                ]
+                )
             }
         }
+
+        return allEntries
     }
 
     static func buildScanEntry(
         location: JunkLocation,
         directories: [URL],
         excludedPaths: Set<String>,
-        protectedRootPaths: Set<String>
+        protectedRootPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
     ) -> JunkScanEntry {
         var totalSize: UInt64 = 0
         var totalFiles = 0
@@ -38,6 +60,7 @@ extension JunkCleanerService {
         var errors: [String] = []
 
         for directory in directories {
+            if shouldCancel() { break }
             guard fileManager.fileExists(atPath: directory.path) else { continue }
             do {
                 let children = try fileManager.contentsOfDirectory(
@@ -47,6 +70,7 @@ extension JunkCleanerService {
                 )
 
                 for child in children {
+                    if shouldCancel() { break }
                     if shouldSkip(child, excludedPaths: excludedPaths, protectedRootPaths: protectedRootPaths) {
                         excludedItemsCount += 1
                         continue
@@ -79,7 +103,8 @@ extension JunkCleanerService {
     static func buildGradleScanEntries(
         homeDirectory: URL,
         excludedPaths: Set<String>,
-        protectedRootPaths: Set<String>
+        protectedRootPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
     ) -> [JunkScanEntry] {
         let cacheRoot = homeDirectory.appendingPathComponent(".gradle/caches")
         let wrapperRoot = homeDirectory.appendingPathComponent(".gradle/wrapper")
@@ -90,14 +115,20 @@ extension JunkCleanerService {
             $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending
         }
         for versionDirectory in versionDirectories {
+            if shouldCancel() { break }
             entries.append(
                 buildScanEntry(
                     location: .gradleCaches,
                     directories: [versionDirectory],
                     excludedPaths: excludedPaths,
-                    protectedRootPaths: protectedRootPaths
+                    protectedRootPaths: protectedRootPaths,
+                    shouldCancel: shouldCancel
                 )
             )
+        }
+
+        if shouldCancel() {
+            return entries
         }
 
         let sharedDirectories = gradleSharedDirectories(in: cacheRoot, excluding: Set(versionDirectories.map(\.path)))
@@ -107,29 +138,32 @@ extension JunkCleanerService {
                     location: .gradleCaches,
                     directories: sharedDirectories,
                     excludedPaths: excludedPaths,
-                    protectedRootPaths: protectedRootPaths
+                    protectedRootPaths: protectedRootPaths,
+                    shouldCancel: shouldCancel
                 )
             )
         }
 
-        if fileManager.fileExists(atPath: wrapperRoot.path) {
+        if !shouldCancel(), fileManager.fileExists(atPath: wrapperRoot.path) {
             entries.append(
                 buildScanEntry(
                     location: .gradleCaches,
                     directories: [wrapperRoot],
                     excludedPaths: excludedPaths,
-                    protectedRootPaths: protectedRootPaths
+                    protectedRootPaths: protectedRootPaths,
+                    shouldCancel: shouldCancel
                 )
             )
         }
 
-        if entries.isEmpty {
+        if entries.isEmpty, !shouldCancel() {
             entries.append(
                 buildScanEntry(
                     location: .gradleCaches,
                     directories: [cacheRoot, wrapperRoot],
                     excludedPaths: excludedPaths,
-                    protectedRootPaths: protectedRootPaths
+                    protectedRootPaths: protectedRootPaths,
+                    shouldCancel: shouldCancel
                 )
             )
         }

@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode / SwiftPM
+.build/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# App build artifacts
+*.app
+*.dSYM
+*.dSYM.zip
+
+# Test / coverage
+*.xccovreport
+*.xccovarchive
+
+# Local tooling
+.derivedData/

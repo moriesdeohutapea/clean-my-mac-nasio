@@ -1,0 +1,560 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		A5EC24F02E2B2BE700E0E9AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A5EC24D42E2B2BE600E0E9AC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A5EC24DB2E2B2BE600E0E9AC;
+			remoteInfo = CleanMacNasio;
+		};
+		A5EC24FA2E2B2BE700E0E9AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A5EC24D42E2B2BE600E0E9AC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A5EC24DB2E2B2BE600E0E9AC;
+			remoteInfo = CleanMacNasio;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A5EC24DC2E2B2BE600E0E9AC /* CleanMacNasio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CleanMacNasio.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5EC24EF2E2B2BE700E0E9AC /* CleanMacNasioTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleanMacNasioTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5EC24F92E2B2BE700E0E9AC /* CleanMacNasioUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleanMacNasioUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A5EC24DE2E2B2BE600E0E9AC /* CleanMacNasio */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CleanMacNasio;
+			sourceTree = "<group>";
+		};
+		A5EC24F22E2B2BE700E0E9AC /* CleanMacNasioTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CleanMacNasioTests;
+			sourceTree = "<group>";
+		};
+		A5EC24FC2E2B2BE700E0E9AC /* CleanMacNasioUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CleanMacNasioUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A5EC24D92E2B2BE600E0E9AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5EC24EC2E2B2BE700E0E9AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5EC24F62E2B2BE700E0E9AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A5EC24D32E2B2BE600E0E9AC = {
+			isa = PBXGroup;
+			children = (
+				A5EC24DE2E2B2BE600E0E9AC /* CleanMacNasio */,
+				A5EC24F22E2B2BE700E0E9AC /* CleanMacNasioTests */,
+				A5EC24FC2E2B2BE700E0E9AC /* CleanMacNasioUITests */,
+				A5EC24DD2E2B2BE600E0E9AC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A5EC24DD2E2B2BE600E0E9AC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A5EC24DC2E2B2BE600E0E9AC /* CleanMacNasio.app */,
+				A5EC24EF2E2B2BE700E0E9AC /* CleanMacNasioTests.xctest */,
+				A5EC24F92E2B2BE700E0E9AC /* CleanMacNasioUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A5EC24DB2E2B2BE600E0E9AC /* CleanMacNasio */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A5EC25032E2B2BE700E0E9AC /* Build configuration list for PBXNativeTarget "CleanMacNasio" */;
+			buildPhases = (
+				A5EC24D82E2B2BE600E0E9AC /* Sources */,
+				A5EC24D92E2B2BE600E0E9AC /* Frameworks */,
+				A5EC24DA2E2B2BE600E0E9AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A5EC24DE2E2B2BE600E0E9AC /* CleanMacNasio */,
+			);
+			name = CleanMacNasio;
+			packageProductDependencies = (
+			);
+			productName = CleanMacNasio;
+			productReference = A5EC24DC2E2B2BE600E0E9AC /* CleanMacNasio.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A5EC24EE2E2B2BE700E0E9AC /* CleanMacNasioTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A5EC25062E2B2BE700E0E9AC /* Build configuration list for PBXNativeTarget "CleanMacNasioTests" */;
+			buildPhases = (
+				A5EC24EB2E2B2BE700E0E9AC /* Sources */,
+				A5EC24EC2E2B2BE700E0E9AC /* Frameworks */,
+				A5EC24ED2E2B2BE700E0E9AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A5EC24F12E2B2BE700E0E9AC /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A5EC24F22E2B2BE700E0E9AC /* CleanMacNasioTests */,
+			);
+			name = CleanMacNasioTests;
+			packageProductDependencies = (
+			);
+			productName = CleanMacNasioTests;
+			productReference = A5EC24EF2E2B2BE700E0E9AC /* CleanMacNasioTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A5EC24F82E2B2BE700E0E9AC /* CleanMacNasioUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A5EC25092E2B2BE700E0E9AC /* Build configuration list for PBXNativeTarget "CleanMacNasioUITests" */;
+			buildPhases = (
+				A5EC24F52E2B2BE700E0E9AC /* Sources */,
+				A5EC24F62E2B2BE700E0E9AC /* Frameworks */,
+				A5EC24F72E2B2BE700E0E9AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A5EC24FB2E2B2BE700E0E9AC /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A5EC24FC2E2B2BE700E0E9AC /* CleanMacNasioUITests */,
+			);
+			name = CleanMacNasioUITests;
+			packageProductDependencies = (
+			);
+			productName = CleanMacNasioUITests;
+			productReference = A5EC24F92E2B2BE700E0E9AC /* CleanMacNasioUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A5EC24D42E2B2BE600E0E9AC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					A5EC24DB2E2B2BE600E0E9AC = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					A5EC24EE2E2B2BE700E0E9AC = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = A5EC24DB2E2B2BE600E0E9AC;
+					};
+					A5EC24F82E2B2BE700E0E9AC = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = A5EC24DB2E2B2BE600E0E9AC;
+					};
+				};
+			};
+			buildConfigurationList = A5EC24D72E2B2BE600E0E9AC /* Build configuration list for PBXProject "CleanMacNasio" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A5EC24D32E2B2BE600E0E9AC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A5EC24DD2E2B2BE600E0E9AC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A5EC24DB2E2B2BE600E0E9AC /* CleanMacNasio */,
+				A5EC24EE2E2B2BE700E0E9AC /* CleanMacNasioTests */,
+				A5EC24F82E2B2BE700E0E9AC /* CleanMacNasioUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A5EC24DA2E2B2BE600E0E9AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5EC24ED2E2B2BE700E0E9AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5EC24F72E2B2BE700E0E9AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A5EC24D82E2B2BE600E0E9AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5EC24EB2E2B2BE700E0E9AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5EC24F52E2B2BE700E0E9AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A5EC24F12E2B2BE700E0E9AC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A5EC24DB2E2B2BE600E0E9AC /* CleanMacNasio */;
+			targetProxy = A5EC24F02E2B2BE700E0E9AC /* PBXContainerItemProxy */;
+		};
+		A5EC24FB2E2B2BE700E0E9AC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A5EC24DB2E2B2BE600E0E9AC /* CleanMacNasio */;
+			targetProxy = A5EC24FA2E2B2BE700E0E9AC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A5EC25012E2B2BE700E0E9AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A5EC25022E2B2BE700E0E9AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A5EC25042E2B2BE700E0E9AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CleanMacNasio/CleanMacNasio.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasio;
+				PRODUCT_MODULE_NAME = CleanMacNasio;
+				INFOPLIST_KEY_CFBundleDisplayName = CleanMacNasio;
+				PRODUCT_NAME = CleanMacNasio;
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A5EC25052E2B2BE700E0E9AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CleanMacNasio/CleanMacNasio.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasio;
+				PRODUCT_MODULE_NAME = CleanMacNasio;
+				INFOPLIST_KEY_CFBundleDisplayName = CleanMacNasio;
+				PRODUCT_NAME = CleanMacNasio;
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A5EC25072E2B2BE700E0E9AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasioTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CleanMacNasio.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CleanMacNasio";
+			};
+			name = Debug;
+		};
+		A5EC25082E2B2BE700E0E9AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasioTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CleanMacNasio.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CleanMacNasio";
+			};
+			name = Release;
+		};
+		A5EC250A2E2B2BE700E0E9AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasioUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CleanMacNasio;
+			};
+			name = Debug;
+		};
+		A5EC250B2E2B2BE700E0E9AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mories.clean.CleanMacNasioUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CleanMacNasio;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A5EC24D72E2B2BE600E0E9AC /* Build configuration list for PBXProject "CleanMacNasio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5EC25012E2B2BE700E0E9AC /* Debug */,
+				A5EC25022E2B2BE700E0E9AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A5EC25032E2B2BE700E0E9AC /* Build configuration list for PBXNativeTarget "CleanMacNasio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5EC25042E2B2BE700E0E9AC /* Debug */,
+				A5EC25052E2B2BE700E0E9AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A5EC25062E2B2BE700E0E9AC /* Build configuration list for PBXNativeTarget "CleanMacNasioTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5EC25072E2B2BE700E0E9AC /* Debug */,
+				A5EC25082E2B2BE700E0E9AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A5EC25092E2B2BE700E0E9AC /* Build configuration list for PBXNativeTarget "CleanMacNasioUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5EC250A2E2B2BE700E0E9AC /* Debug */,
+				A5EC250B2E2B2BE700E0E9AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A5EC24D42E2B2BE600E0E9AC /* Project object */;
+}

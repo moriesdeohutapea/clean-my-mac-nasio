@@ -19,7 +19,6 @@ CleanMacNasio is a macOS SwiftUI utility to scan common developer junk locations
 - Flutter caches
 - Homebrew caches
 - `~/.Trash`
-- Large files in Takeout paths
 
 ## Tech Stack
 

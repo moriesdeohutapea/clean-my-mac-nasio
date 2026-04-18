@@ -23,7 +23,7 @@ struct ContentView: View {
     @StateObject private var viewModel: ContentViewModel
 
     private var isRunningInPreview: Bool {
-        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != nil
     }
 
     init() {
@@ -58,34 +58,34 @@ struct ContentView: View {
             )
             .ignoresSafeArea()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    DashboardHeader(
-                        homePath: viewModel.homeDirectoryURL?.path,
-                        isBusy: viewModel.isBusy,
-                        isScanning: viewModel.isScanning,
-                        statusText: viewModel.statusText,
-                        scanProgressMessage: viewModel.scanProgressMessage,
-                        scanProgressDetail: viewModel.scanProgressDetail,
-                        scanProgressFraction: viewModel.scanProgressFraction,
-                        onScan: viewModel.scanJunk,
-                        onStopScan: viewModel.requestStopScan,
-                        canScan: viewModel.canScan
-                    )
+            VStack(alignment: .leading, spacing: 22) {
+                DashboardHeader(
+                    homePath: viewModel.homeDirectoryURL?.path,
+                    isBusy: viewModel.isBusy,
+                    isScanning: viewModel.isScanning,
+                    statusText: viewModel.statusText,
+                    scanProgressMessage: viewModel.scanProgressMessage,
+                    scanProgressDetail: viewModel.scanProgressDetail,
+                    scanProgressFraction: viewModel.scanProgressFraction,
+                    onScan: viewModel.scanJunk,
+                    onStopScan: viewModel.requestStopScan,
+                    canScan: viewModel.canScan
+                )
 
-                    HStack(alignment: .top, spacing: 14) {
-                        MetricTile(title: "Ready To Clean", value: FileUtils.formatBytes(viewModel.selectedTotalSize), caption: "\(viewModel.selectedCategoryCount) categories")
-                        MetricTile(title: "Detected", value: FileUtils.formatBytes(viewModel.totalScanSize), caption: "\(viewModel.totalFileCount) files")
-                        MetricTile(title: "Excluded", value: "\(viewModel.excludedPaths.count)", caption: "protected paths")
-                    }
+                HStack(alignment: .top, spacing: 14) {
+                    MetricTile(title: "Ready To Clean", value: FileUtils.formatBytes(viewModel.selectedTotalSize), caption: "\(viewModel.selectedCategoryCount) categories")
+                    MetricTile(title: "Detected", value: FileUtils.formatBytes(viewModel.totalScanSize), caption: "\(viewModel.totalFileCount) files")
+                    MetricTile(title: "Excluded", value: "\(viewModel.excludedPaths.count)", caption: "protected paths")
+                }
 
-                    HStack(alignment: .top, spacing: 20) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            SectionTitle(title: "Clean Targets", subtitle: "Auto-scanned from common cache locations")
+                HStack(alignment: .top, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionTitle(title: "Clean Targets", subtitle: "Auto-scanned from common cache locations")
 
-                            if viewModel.scanEntries.isEmpty {
-                                EmptyScanState()
-                            } else {
+                        if viewModel.scanEntries.isEmpty {
+                            EmptyScanState()
+                        } else {
+                            ScrollView {
                                 LazyVStack(spacing: 12) {
                                     ForEach(viewModel.scanEntries) { entry in
                                         JunkLocationCard(
@@ -96,46 +96,49 @@ struct ContentView: View {
                                     }
                                 }
                             }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            SectionTitle(title: "Actions", subtitle: "Pilih item yang mau dihapus")
-
-                            SelectionActionPanel(
-                                selectedCount: viewModel.selectedCategoryCount,
-                                selectedTotalSize: viewModel.selectedTotalSize,
-                                canClean: viewModel.canClean,
-                                hasSelection: viewModel.hasSelection,
-                                onSelectAll: viewModel.selectAllDetected,
-                                onClearSelection: viewModel.clearSelection,
-                                onCleanSelected: viewModel.cleanSelected
-                            )
-
-                            SectionTitle(title: "Protection", subtitle: "Excluded paths stay untouched")
-
-                            ExcludedPathsPanel(
-                                excludedPaths: viewModel.excludedPaths,
-                                onAdd: pickExcludePath,
-                                onRemove: viewModel.removeExcludedPath
-                            )
-
-                            if !viewModel.logMessage.isEmpty || viewModel.isBusy {
-                                StatusPanel(
-                                    message: viewModel.logMessage,
-                                    isWorking: viewModel.isBusy,
-                                    workingText: viewModel.workingText,
-                                    progressMessage: viewModel.isCleaning ? viewModel.cleanProgressMessage : viewModel.scanProgressMessage,
-                                    progressDetail: viewModel.isCleaning ? viewModel.cleanProgressDetail : viewModel.scanProgressDetail,
-                                    progressFraction: viewModel.isCleaning ? viewModel.cleanProgressFraction : viewModel.scanProgressFraction
-                                )
-                            }
-                        }
-                        .frame(width: 280, alignment: .topLeading)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionTitle(title: "Actions", subtitle: "Pilih item yang mau dihapus")
+
+                        SelectionActionPanel(
+                            selectedCount: viewModel.selectedCategoryCount,
+                            selectedTotalSize: viewModel.selectedTotalSize,
+                            canClean: viewModel.canClean,
+                            hasSelection: viewModel.hasSelection,
+                            onSelectAll: viewModel.selectAllDetected,
+                            onClearSelection: viewModel.clearSelection,
+                            onCleanSelected: viewModel.cleanSelected
+                        )
+
+                        SectionTitle(title: "Protection", subtitle: "Excluded paths stay untouched")
+
+                        ExcludedPathsPanel(
+                            excludedPaths: viewModel.excludedPaths,
+                            onAdd: pickExcludePath,
+                            onRemove: viewModel.removeExcludedPath
+                        )
+
+                        if !viewModel.logMessage.isEmpty || viewModel.isBusy {
+                            StatusPanel(
+                                message: viewModel.logMessage,
+                                isWorking: viewModel.isBusy,
+                                workingText: viewModel.workingText,
+                                progressMessage: viewModel.isCleaning ? viewModel.cleanProgressMessage : viewModel.scanProgressMessage,
+                                progressDetail: viewModel.isCleaning ? viewModel.cleanProgressDetail : viewModel.scanProgressDetail,
+                                progressFraction: viewModel.isCleaning ? viewModel.cleanProgressFraction : viewModel.scanProgressFraction
+                            )
+                        }
+                    }
+                    .frame(width: 280, alignment: .topLeading)
                 }
-                .padding(28)
+                .frame(maxHeight: .infinity, alignment: .top)
             }
+            .padding(28)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .foregroundColor(DashboardStyle.text)
         .frame(minWidth: 900, minHeight: 640)
@@ -191,11 +194,15 @@ private struct DashboardHeader: View {
 
             HStack(spacing: 10) {
                 Button("Scan", action: onScan)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.green)
                     .controlSize(.large)
                     .disabled(!canScan)
 
                 if isScanning {
                     Button("Stop", action: onStopScan)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
                         .controlSize(.large)
                 }
             }
@@ -587,19 +594,6 @@ private extension ContentView {
                         JunkPreviewItem(path: "/Users/yourname/.Trash/old-build.zip", size: 75_000_000)
                     ],
                     excludedItemsCount: 0
-                ),
-                JunkScanEntry(
-                    location: .largeFiles,
-                    directoryURLs: [
-                        URL(fileURLWithPath: "/Users/yourname/Movies/archive-raw.mov")
-                    ],
-                    totalSize: 1_600_000_000,
-                    fileCount: 1,
-                    errorMessage: nil,
-                    previewItems: [
-                        JunkPreviewItem(path: "/Users/yourname/Movies/archive-raw.mov", size: 1_600_000_000)
-                    ],
-                    excludedItemsCount: 0
                 )
             ],
             previewExcludedPaths: [
@@ -611,16 +605,8 @@ private extension ContentView {
     }
 }
 
-#Preview("Layout Preview - Light", traits: .sizeThatFitsLayout) {
+#Preview("Layout Preview") {
     ContentView.previewContent
+        .frame(width: 1200, height: 760)
         .preferredColorScheme(.light)
-}
-
-#Preview("Layout Preview - Dark", traits: .sizeThatFitsLayout) {
-    ContentView.previewContent
-        .preferredColorScheme(.dark)
-}
-
-#Preview("Layout Preview", traits: .sizeThatFitsLayout) {
-    ContentView.previewContent
 }

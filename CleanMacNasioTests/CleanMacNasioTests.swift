@@ -228,82 +228,6 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertFalse(fileManager.fileExists(atPath: deletable.path))
     }
 
-    func testLargeFilesScanAndClean() throws {
-        let fileManager = FileManager.default
-        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        let takeout = home.appendingPathComponent("Downloads/Takeout", isDirectory: true)
-        try fileManager.createDirectory(at: takeout, withIntermediateDirectories: true)
-        defer { try? fileManager.removeItem(at: home) }
-
-        let largeFile = takeout.appendingPathComponent("large.bin")
-        let smallFile = takeout.appendingPathComponent("small.bin")
-
-        try Data().write(to: largeFile)
-        let largeHandle = try FileHandle(forWritingTo: largeFile)
-        try largeHandle.truncate(atOffset: 600 * 1024 * 1024)
-        try largeHandle.close()
-
-        try Data(repeating: 1, count: 1024).write(to: smallFile)
-
-        let entries = JunkCleanerService.scan(
-            locations: [.largeFiles],
-            homeDirectory: home,
-            excludedPaths: []
-        )
-        let entry = try XCTUnwrap(entries.first)
-
-        XCTAssertEqual(entry.location, .largeFiles)
-        XCTAssertEqual(entry.fileCount, 1)
-        XCTAssertEqual(
-            normalizedPath(entry.directoryURLs.first?.path),
-            normalizedPath(largeFile.path)
-        )
-        XCTAssertFalse(entry.previewItems.isEmpty)
-
-        let summary = JunkCleanerService.clean(entries: entries, excludedPaths: [])
-        XCTAssertEqual(summary.results.first?.deletedItems, 1)
-        XCTAssertFalse(fileManager.fileExists(atPath: largeFile.path))
-        XCTAssertTrue(fileManager.fileExists(atPath: smallFile.path))
-    }
-
-    func testLargeFilesScanSkipsProtectedExtensions() throws {
-        let fileManager = FileManager.default
-        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        let takeout = home.appendingPathComponent("Downloads/Takeout", isDirectory: true)
-        try fileManager.createDirectory(at: takeout, withIntermediateDirectories: true)
-        defer { try? fileManager.removeItem(at: home) }
-
-        let protectedFile = takeout.appendingPathComponent("release.jks")
-        let regularFile = takeout.appendingPathComponent("movie.iso")
-
-        try Data().write(to: protectedFile)
-        let protectedHandle = try FileHandle(forWritingTo: protectedFile)
-        try protectedHandle.truncate(atOffset: 600 * 1024 * 1024)
-        try protectedHandle.close()
-
-        try Data().write(to: regularFile)
-        let regularHandle = try FileHandle(forWritingTo: regularFile)
-        try regularHandle.truncate(atOffset: 600 * 1024 * 1024)
-        try regularHandle.close()
-
-        let entry = try XCTUnwrap(
-            JunkCleanerService.scan(
-                locations: [.largeFiles],
-                homeDirectory: home,
-                excludedPaths: []
-            ).first
-        )
-
-        XCTAssertEqual(entry.fileCount, 1)
-        XCTAssertEqual(
-            normalizedPath(entry.directoryURLs.first?.path),
-            normalizedPath(regularFile.path)
-        )
-        XCTAssertFalse(entry.directoryURLs.contains(where: {
-            normalizedPath($0.path) == normalizedPath(protectedFile.path)
-        }))
-    }
-
     func testCleanSkipsProtectedSensitiveFiles() throws {
         let fileManager = FileManager.default
         let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -315,7 +239,7 @@ final class CleanMacNasioTests: XCTestCase {
         try Data(repeating: 1, count: 256).write(to: protectedFile)
 
         let entry = JunkScanEntry(
-            location: .largeFiles,
+            location: .caches,
             directoryURLs: [protectedFile],
             totalSize: 256,
             fileCount: 1,

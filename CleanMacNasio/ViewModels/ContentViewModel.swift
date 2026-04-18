@@ -8,8 +8,7 @@ final class ContentViewModel: ObservableObject {
         .gradleCaches,
         .flutterCaches,
         .homebrewCaches,
-        .trash,
-        .largeFiles
+        .trash
     ]
 
     @Published var homeDirectoryURL: URL?

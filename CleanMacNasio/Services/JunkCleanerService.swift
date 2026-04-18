@@ -16,7 +16,6 @@ enum JunkLocation: String, CaseIterable, Identifiable {
     case flutterCaches
     case homebrewCaches
     case trash
-    case largeFiles
 
     var id: String { rawValue }
 
@@ -38,8 +37,6 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Homebrew Caches"
         case .trash:
             return "Trash"
-        case .largeFiles:
-            return "Large Files (>500 MB)"
         }
     }
 
@@ -51,7 +48,7 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Library/Logs"
         case .temporaryDirectory:
             return nil
-        case .androidStudioCaches, .gradleCaches, .flutterCaches, .homebrewCaches, .trash, .largeFiles:
+        case .androidStudioCaches, .gradleCaches, .flutterCaches, .homebrewCaches, .trash:
             return nil
         }
     }
@@ -91,11 +88,6 @@ enum JunkLocation: String, CaseIterable, Identifiable {
         case .trash:
             return compactUniqueDirectories([
                 homeDirectory.appendingPathComponent(".Trash")
-            ])
-        case .largeFiles:
-            return compactUniqueDirectories([
-                homeDirectory.appendingPathComponent("Downloads/Takeout"),
-                homeDirectory.appendingPathComponent("Takeout")
             ])
         }
     }
@@ -172,9 +164,6 @@ struct JunkScanEntry: Identifiable {
     let excludedItemsCount: Int
 
     var id: String {
-        if location == .largeFiles {
-            return location.id
-        }
         let directoryKey = directoryURLs.map(\.path).joined(separator: "|")
         return "\(location.id)|\(directoryKey)"
     }
@@ -235,7 +224,6 @@ protocol JunkCleaningServicing: Sendable {
 
 struct JunkCleanerService {
     private static let fileManager = FileManager.default
-    private static let largeFileThresholdBytes: UInt64 = 500 * 1024 * 1024
     private static let protectedFileExtensions: Set<String> = [
         "jks", "keystore",
         "p12", "cer", "pem", "key", "mobileprovision",
@@ -252,14 +240,6 @@ struct JunkCleanerService {
                     excludedPaths: excludedPaths,
                     protectedRootPaths: protectedRoots
                 )
-            case .largeFiles:
-                return [
-                    buildLargeFilesEntry(
-                        directories: location.resolveDirectories(homeDirectory: homeDirectory),
-                        excludedPaths: excludedPaths,
-                        protectedRootPaths: protectedRoots
-                    )
-                ]
             default:
                 let directories = location.resolveDirectories(homeDirectory: homeDirectory)
                 return [
@@ -413,76 +393,6 @@ struct JunkCleanerService {
         }
 
         return entries
-    }
-
-    private static func buildLargeFilesEntry(
-        directories: [URL],
-        excludedPaths: Set<String>,
-        protectedRootPaths: Set<String>
-    ) -> JunkScanEntry {
-        let existingDirectories = directories.filter { fileManager.fileExists(atPath: $0.path) }
-        guard !existingDirectories.isEmpty else {
-            return JunkScanEntry(
-                location: .largeFiles,
-                directoryURLs: [],
-                totalSize: 0,
-                fileCount: 0,
-                errorMessage: nil,
-                previewItems: [],
-                excludedItemsCount: 0
-            )
-        }
-
-        var matchedFiles: [(url: URL, size: UInt64)] = []
-        var totalSize: UInt64 = 0
-        var excludedItemsCount = 0
-        var errors: [String] = []
-
-        for directory in existingDirectories {
-            guard let enumerator = fileManager.enumerator(
-                at: directory,
-                includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey],
-                options: [.skipsHiddenFiles]
-            ) else {
-                errors.append("Failed to enumerate \(directory.path).")
-                continue
-            }
-
-            for case let itemURL as URL in enumerator {
-                if shouldSkip(itemURL, excludedPaths: excludedPaths, protectedRootPaths: protectedRootPaths) {
-                    excludedItemsCount += 1
-                    continue
-                }
-
-                guard let values = try? itemURL.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]),
-                      values.isRegularFile == true else {
-                    continue
-                }
-
-                let fileSize = UInt64(values.fileSize ?? 0)
-                if fileSize >= largeFileThresholdBytes {
-                    matchedFiles.append((url: itemURL, size: fileSize))
-                    totalSize += fileSize
-                }
-            }
-        }
-
-        let previewItems = matchedFiles
-            .sorted { $0.size > $1.size }
-            .prefix(5)
-            .map { row in
-                JunkPreviewItem(path: row.url.path, size: row.size)
-            }
-
-        return JunkScanEntry(
-            location: .largeFiles,
-            directoryURLs: matchedFiles.map(\.url),
-            totalSize: totalSize,
-            fileCount: matchedFiles.count,
-            errorMessage: errors.isEmpty ? nil : errors.joined(separator: "\n"),
-            previewItems: Array(previewItems),
-            excludedItemsCount: excludedItemsCount
-        )
     }
 
     private static func gradleVersionDirectories(in cacheRoot: URL) -> [URL] {

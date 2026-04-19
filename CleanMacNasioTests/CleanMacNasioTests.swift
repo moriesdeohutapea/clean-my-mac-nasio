@@ -381,6 +381,128 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertEqual(entry.fileCount, 2)
     }
 
+    func testMavenScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let maven = home.appendingPathComponent(".m2/repository", isDirectory: true)
+
+        try fileManager.createDirectory(at: maven, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 31).write(to: maven.appendingPathComponent("maven.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.mavenCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .mavenCaches)
+        XCTAssertEqual(entry.totalSize, 31)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testIvyScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let ivy = home.appendingPathComponent(".ivy2/cache", isDirectory: true)
+
+        try fileManager.createDirectory(at: ivy, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 32).write(to: ivy.appendingPathComponent("ivy.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.ivyCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .ivyCaches)
+        XCTAssertEqual(entry.totalSize, 32)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testPipScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let pipDotCache = home.appendingPathComponent(".cache/pip", isDirectory: true)
+        let pipLibraryCache = home.appendingPathComponent("Library/Caches/pip", isDirectory: true)
+
+        try fileManager.createDirectory(at: pipDotCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: pipLibraryCache, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 17).write(to: pipDotCache.appendingPathComponent("pip-a.bin"))
+        try Data(repeating: 1, count: 19).write(to: pipLibraryCache.appendingPathComponent("pip-b.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.pipCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .pipCaches)
+        XCTAssertEqual(entry.totalSize, 36)
+        XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testCargoScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let cargoRegistry = home.appendingPathComponent(".cargo/registry", isDirectory: true)
+        let cargoGit = home.appendingPathComponent(".cargo/git", isDirectory: true)
+
+        try fileManager.createDirectory(at: cargoRegistry, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: cargoGit, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 26).write(to: cargoRegistry.appendingPathComponent("registry.bin"))
+        try Data(repeating: 1, count: 24).write(to: cargoGit.appendingPathComponent("git.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.cargoCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .cargoCaches)
+        XCTAssertEqual(entry.totalSize, 50)
+        XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testDockerScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let dockerBuildx = home.appendingPathComponent(".docker/buildx", isDirectory: true)
+        let dockerLibraryCache = home.appendingPathComponent("Library/Caches/com.docker.docker", isDirectory: true)
+        let dockerLogs = home.appendingPathComponent("Library/Containers/com.docker.docker/Data/log", isDirectory: true)
+
+        try fileManager.createDirectory(at: dockerBuildx, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: dockerLibraryCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: dockerLogs, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 11).write(to: dockerBuildx.appendingPathComponent("buildx.bin"))
+        try Data(repeating: 1, count: 22).write(to: dockerLibraryCache.appendingPathComponent("cache.bin"))
+        try Data(repeating: 1, count: 33).write(to: dockerLogs.appendingPathComponent("log.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.dockerCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .dockerCaches)
+        XCTAssertEqual(entry.totalSize, 66)
+        XCTAssertEqual(entry.fileCount, 3)
+    }
+
     func testXcodeArchivesScanFindsPath() throws {
         let fileManager = FileManager.default
         let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)

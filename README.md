@@ -21,6 +21,11 @@ CleanMacNasio is a macOS SwiftUI utility to scan common developer junk locations
 - npm caches (`~/.npm`)
 - Yarn caches (`~/Library/Caches/Yarn`, `~/.cache/yarn`)
 - pnpm store (`~/Library/pnpm/store`, `~/.pnpm-store`)
+- Maven caches (`~/.m2/repository`)
+- Ivy caches (`~/.ivy2/cache`)
+- pip caches (`~/.cache/pip`, `~/Library/Caches/pip`)
+- Cargo caches (`~/.cargo/registry`, `~/.cargo/git`)
+- Docker caches (`~/.docker/buildx`, `~/Library/Caches/com.docker.docker`, `~/Library/Containers/com.docker.docker/Data/log`)
 - Android Studio caches (Google and JetBrains paths)
 - Gradle caches and wrapper
 - Flutter caches

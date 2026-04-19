@@ -71,6 +71,11 @@ private struct AboutDetailView: View {
         .init(name: "npm Caches", paths: ["~/.npm"]),
         .init(name: "Yarn Caches", paths: ["~/Library/Caches/Yarn", "~/.cache/yarn"]),
         .init(name: "pnpm Store", paths: ["~/Library/pnpm/store", "~/.pnpm-store"]),
+        .init(name: "Maven Caches", paths: ["~/.m2/repository"]),
+        .init(name: "Ivy Caches", paths: ["~/.ivy2/cache"]),
+        .init(name: "pip Caches", paths: ["~/.cache/pip", "~/Library/Caches/pip"]),
+        .init(name: "Cargo Caches", paths: ["~/.cargo/registry", "~/.cargo/git"]),
+        .init(name: "Docker Caches", paths: ["~/.docker/buildx", "~/Library/Caches/com.docker.docker", "~/Library/Containers/com.docker.docker/Data/log"], note: "Fokus ke cache/log lokal Docker yang umum."),
         .init(name: "Android Studio Caches", paths: [
             "~/Library/Caches/Google/AndroidStudio*",
             "~/Library/Logs/Google/AndroidStudio*",

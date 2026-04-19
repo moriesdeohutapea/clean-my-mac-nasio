@@ -19,6 +19,11 @@ enum JunkLocation: String, CaseIterable, Identifiable {
     case npmCaches
     case yarnCaches
     case pnpmStore
+    case mavenCaches
+    case ivyCaches
+    case pipCaches
+    case cargoCaches
+    case dockerCaches
     case homebrewCaches
     case nixCaches
     case trash
@@ -53,6 +58,16 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Yarn Caches"
         case .pnpmStore:
             return "pnpm Store"
+        case .mavenCaches:
+            return "Maven Caches"
+        case .ivyCaches:
+            return "Ivy Caches"
+        case .pipCaches:
+            return "pip Caches"
+        case .cargoCaches:
+            return "Cargo Caches"
+        case .dockerCaches:
+            return "Docker Caches"
         case .homebrewCaches:
             return "Homebrew Caches"
         case .nixCaches:
@@ -68,7 +83,7 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Library/Caches"
         case .logs:
             return "Library/Logs"
-        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .xcodeDerivedData, .xcodeArchives, .cocoaPodsCaches, .swiftPMCaches, .npmCaches, .yarnCaches, .pnpmStore, .homebrewCaches, .nixCaches, .trash:
+        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .xcodeDerivedData, .xcodeArchives, .cocoaPodsCaches, .swiftPMCaches, .npmCaches, .yarnCaches, .pnpmStore, .mavenCaches, .ivyCaches, .pipCaches, .cargoCaches, .dockerCaches, .homebrewCaches, .nixCaches, .trash:
             return nil
         }
     }
@@ -128,6 +143,30 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return compactUniqueDirectories([
                 homeDirectory.appendingPathComponent("Library/pnpm/store"),
                 homeDirectory.appendingPathComponent(".pnpm-store")
+            ])
+        case .mavenCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".m2/repository")
+            ])
+        case .ivyCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".ivy2/cache")
+            ])
+        case .pipCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".cache/pip"),
+                homeDirectory.appendingPathComponent("Library/Caches/pip")
+            ])
+        case .cargoCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".cargo/registry"),
+                homeDirectory.appendingPathComponent(".cargo/git")
+            ])
+        case .dockerCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".docker/buildx"),
+                homeDirectory.appendingPathComponent("Library/Caches/com.docker.docker"),
+                homeDirectory.appendingPathComponent("Library/Containers/com.docker.docker/Data/log")
             ])
         case .homebrewCaches:
             return compactUniqueDirectories([

@@ -196,3 +196,13 @@ private struct AboutTargetInfo: Identifiable {
         self.note = note
     }
 }
+
+#Preview("About Panel") {
+    AboutAppPanel()
+        .padding()
+        .frame(width: 320)
+}
+
+#Preview("About Window") {
+    AboutWindowView()
+}

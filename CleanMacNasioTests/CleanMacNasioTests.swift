@@ -503,6 +503,109 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertEqual(entry.fileCount, 3)
     }
 
+    func testPoetryPipenvScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let poetry = home.appendingPathComponent(".cache/pypoetry", isDirectory: true)
+        let virtualenvs = home.appendingPathComponent(".local/share/virtualenvs", isDirectory: true)
+        let pipenv = home.appendingPathComponent(".cache/pipenv", isDirectory: true)
+
+        try fileManager.createDirectory(at: poetry, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: virtualenvs, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: pipenv, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 10).write(to: poetry.appendingPathComponent("poetry.bin"))
+        try Data(repeating: 1, count: 20).write(to: virtualenvs.appendingPathComponent("venv.bin"))
+        try Data(repeating: 1, count: 30).write(to: pipenv.appendingPathComponent("pipenv.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.poetryPipenvCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .poetryPipenvCaches)
+        XCTAssertEqual(entry.totalSize, 60)
+        XCTAssertEqual(entry.fileCount, 3)
+    }
+
+    func testGoScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let goBuild = home.appendingPathComponent("Library/Caches/go-build", isDirectory: true)
+        let goMod = home.appendingPathComponent("go/pkg/mod", isDirectory: true)
+
+        try fileManager.createDirectory(at: goBuild, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: goMod, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 12).write(to: goBuild.appendingPathComponent("gobuild.bin"))
+        try Data(repeating: 1, count: 18).write(to: goMod.appendingPathComponent("gomod.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.goCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .goCaches)
+        XCTAssertEqual(entry.totalSize, 30)
+        XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testRubyBundlerScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let bundleCache = home.appendingPathComponent(".bundle/cache", isDirectory: true)
+        let gems = home.appendingPathComponent(".gem", isDirectory: true)
+
+        try fileManager.createDirectory(at: bundleCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: gems, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 14).write(to: bundleCache.appendingPathComponent("bundle.bin"))
+        try Data(repeating: 1, count: 16).write(to: gems.appendingPathComponent("gem.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.rubyBundlerCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .rubyBundlerCaches)
+        XCTAssertEqual(entry.totalSize, 30)
+        XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testKubernetesHelmScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let kubeCache = home.appendingPathComponent(".kube/cache", isDirectory: true)
+        let helmCache = home.appendingPathComponent(".cache/helm", isDirectory: true)
+
+        try fileManager.createDirectory(at: kubeCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: helmCache, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 13).write(to: kubeCache.appendingPathComponent("kube.bin"))
+        try Data(repeating: 1, count: 17).write(to: helmCache.appendingPathComponent("helm.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.kubernetesHelmCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .kubernetesHelmCaches)
+        XCTAssertEqual(entry.totalSize, 30)
+        XCTAssertEqual(entry.fileCount, 2)
+    }
+
     func testXcodeArchivesScanFindsPath() throws {
         let fileManager = FileManager.default
         let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)

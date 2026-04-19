@@ -24,6 +24,10 @@ enum JunkLocation: String, CaseIterable, Identifiable {
     case pipCaches
     case cargoCaches
     case dockerCaches
+    case poetryPipenvCaches
+    case goCaches
+    case rubyBundlerCaches
+    case kubernetesHelmCaches
     case homebrewCaches
     case nixCaches
     case trash
@@ -68,6 +72,14 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Cargo Caches"
         case .dockerCaches:
             return "Docker Caches"
+        case .poetryPipenvCaches:
+            return "Poetry/Pipenv Caches"
+        case .goCaches:
+            return "Go Caches"
+        case .rubyBundlerCaches:
+            return "Ruby/Bundler Caches"
+        case .kubernetesHelmCaches:
+            return "Kubernetes/Helm Caches"
         case .homebrewCaches:
             return "Homebrew Caches"
         case .nixCaches:
@@ -83,7 +95,7 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Library/Caches"
         case .logs:
             return "Library/Logs"
-        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .xcodeDerivedData, .xcodeArchives, .cocoaPodsCaches, .swiftPMCaches, .npmCaches, .yarnCaches, .pnpmStore, .mavenCaches, .ivyCaches, .pipCaches, .cargoCaches, .dockerCaches, .homebrewCaches, .nixCaches, .trash:
+        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .xcodeDerivedData, .xcodeArchives, .cocoaPodsCaches, .swiftPMCaches, .npmCaches, .yarnCaches, .pnpmStore, .mavenCaches, .ivyCaches, .pipCaches, .cargoCaches, .dockerCaches, .poetryPipenvCaches, .goCaches, .rubyBundlerCaches, .kubernetesHelmCaches, .homebrewCaches, .nixCaches, .trash:
             return nil
         }
     }
@@ -167,6 +179,27 @@ enum JunkLocation: String, CaseIterable, Identifiable {
                 homeDirectory.appendingPathComponent(".docker/buildx"),
                 homeDirectory.appendingPathComponent("Library/Caches/com.docker.docker"),
                 homeDirectory.appendingPathComponent("Library/Containers/com.docker.docker/Data/log")
+            ])
+        case .poetryPipenvCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".cache/pypoetry"),
+                homeDirectory.appendingPathComponent(".local/share/virtualenvs"),
+                homeDirectory.appendingPathComponent(".cache/pipenv")
+            ])
+        case .goCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Caches/go-build"),
+                homeDirectory.appendingPathComponent("go/pkg/mod")
+            ])
+        case .rubyBundlerCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".bundle/cache"),
+                homeDirectory.appendingPathComponent(".gem")
+            ])
+        case .kubernetesHelmCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".kube/cache"),
+                homeDirectory.appendingPathComponent(".cache/helm")
             ])
         case .homebrewCaches:
             return compactUniqueDirectories([

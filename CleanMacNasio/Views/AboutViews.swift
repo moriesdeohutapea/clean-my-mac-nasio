@@ -76,6 +76,10 @@ private struct AboutDetailView: View {
         .init(name: "pip Caches", paths: ["~/.cache/pip", "~/Library/Caches/pip"]),
         .init(name: "Cargo Caches", paths: ["~/.cargo/registry", "~/.cargo/git"]),
         .init(name: "Docker Caches", paths: ["~/.docker/buildx", "~/Library/Caches/com.docker.docker", "~/Library/Containers/com.docker.docker/Data/log"], note: "Fokus ke cache/log lokal Docker yang umum."),
+        .init(name: "Poetry/Pipenv Caches", paths: ["~/.cache/pypoetry", "~/.local/share/virtualenvs", "~/.cache/pipenv"]),
+        .init(name: "Go Caches", paths: ["~/Library/Caches/go-build", "~/go/pkg/mod"], note: "Go module cache bisa besar; hapus jika siap download ulang dependency."),
+        .init(name: "Ruby/Bundler Caches", paths: ["~/.bundle/cache", "~/.gem"]),
+        .init(name: "Kubernetes/Helm Caches", paths: ["~/.kube/cache", "~/.cache/helm"]),
         .init(name: "Android Studio Caches", paths: [
             "~/Library/Caches/Google/AndroidStudio*",
             "~/Library/Logs/Google/AndroidStudio*",
@@ -93,6 +97,13 @@ private struct AboutDetailView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
+            Image("AboutQRCode")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .frame(height: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
             Text("About CleanMacNasio")
                 .font(.title3)
                 .fontWeight(.bold)
@@ -104,6 +115,11 @@ private struct AboutDetailView: View {
                     detailText("Version: \(versionText)")
                     detailText("Fungsi utama: scan cache/junk developer umum dan hapus hanya item yang kamu pilih.")
                     detailText("Aplikasi tidak auto-scan saat dibuka. Scan hanya jalan saat tombol Scan ditekan.")
+
+                    sectionTitle("Kontak")
+                    detailText("Mories Deo Hutapea")
+                    detailText("WhatsApp: +6285703666222")
+                    detailText("WhatsApp: +6285785666699")
 
                     sectionTitle("Cara Kerja")
                     detailText("1. Tekan Scan untuk memulai multi-path scanning.")

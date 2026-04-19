@@ -1,8 +1,6 @@
 //
-//  ContentView.swift
-//  CleanMacNasio
-//
-//  Created by Mories Hutapea on 19/07/25.
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
 //
 
 import AppKit
@@ -170,6 +168,16 @@ struct ContentView: View {
         .onAppear {
             guard !isRunningInPreview else { return }
             viewModel.restoreSavedState()
+        }
+        .alert("Konfirmasi Hapus Xcode Archives", isPresented: $viewModel.showArchiveCleanConfirmation) {
+            Button("Batal", role: .cancel) {
+                viewModel.cancelCleanSelectedIncludingArchives()
+            }
+            Button("Lanjut Hapus", role: .destructive) {
+                viewModel.confirmCleanSelectedIncludingArchives()
+            }
+        } message: {
+            Text("Xcode Archives biasanya berisi arsip build release. Pastikan kamu memang ingin menghapus item ini.")
         }
     }
 

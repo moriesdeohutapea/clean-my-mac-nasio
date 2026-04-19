@@ -1,3 +1,8 @@
+//
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
+//
+
 import XCTest
 @testable import CleanMacNasio
 
@@ -55,6 +60,65 @@ final class CleanMacNasioTests: XCTestCase {
             normalizedPath(entries[0].previewItems.first?.path),
             normalizedPath(includeFile.path)
         )
+    }
+
+    func testLogsScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let logs = home.appendingPathComponent("Library/Logs", isDirectory: true)
+        try fileManager.createDirectory(at: logs, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 12).write(to: logs.appendingPathComponent("app.log"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.logs],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .logs)
+        XCTAssertEqual(entry.totalSize, 12)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testTemporaryDirectoryResolvePointsToSystemTemp() {
+        let home = URL(fileURLWithPath: "/tmp/fake-home", isDirectory: true)
+        let directories = JunkLocation.temporaryDirectory.resolveDirectories(homeDirectory: home)
+
+        XCTAssertEqual(directories.count, 1)
+        XCTAssertEqual(
+            normalizedPath(directories[0].path),
+            normalizedPath(URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).path)
+        )
+    }
+
+    func testFlutterScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let pubCache = home.appendingPathComponent(".pub-cache", isDirectory: true)
+        let flutterCache = home.appendingPathComponent("Library/Caches/flutter", isDirectory: true)
+
+        try fileManager.createDirectory(at: pubCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: flutterCache, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 15).write(to: pubCache.appendingPathComponent("a.bin"))
+        try Data(repeating: 1, count: 25).write(to: flutterCache.appendingPathComponent("b.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.flutterCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .flutterCaches)
+        XCTAssertEqual(entry.totalSize, 40)
+        XCTAssertEqual(entry.fileCount, 2)
     }
 
     func testCleanSkipsExcludedItems() throws {
@@ -172,6 +236,200 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertEqual(entry.location, .homebrewCaches)
         XCTAssertEqual(entry.totalSize, 40)
         XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testXcodeDerivedDataScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let derivedData = home.appendingPathComponent("Library/Developer/Xcode/DerivedData", isDirectory: true)
+
+        try fileManager.createDirectory(at: derivedData, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 17).write(to: derivedData.appendingPathComponent("index.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.xcodeDerivedData],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .xcodeDerivedData)
+        XCTAssertEqual(entry.totalSize, 17)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testCocoaPodsScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let cocoaPods = home.appendingPathComponent("Library/Caches/CocoaPods", isDirectory: true)
+
+        try fileManager.createDirectory(at: cocoaPods, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 19).write(to: cocoaPods.appendingPathComponent("pod.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.cocoaPodsCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .cocoaPodsCaches)
+        XCTAssertEqual(entry.totalSize, 19)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testSwiftPMScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let swiftPM = home.appendingPathComponent("Library/Caches/org.swift.swiftpm", isDirectory: true)
+
+        try fileManager.createDirectory(at: swiftPM, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 23).write(to: swiftPM.appendingPathComponent("spm.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.swiftPMCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .swiftPMCaches)
+        XCTAssertEqual(entry.totalSize, 23)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testNpmScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let npm = home.appendingPathComponent(".npm", isDirectory: true)
+
+        try fileManager.createDirectory(at: npm, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 13).write(to: npm.appendingPathComponent("npm.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.npmCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .npmCaches)
+        XCTAssertEqual(entry.totalSize, 13)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testYarnScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let yarnLibrary = home.appendingPathComponent("Library/Caches/Yarn", isDirectory: true)
+        let yarnDotCache = home.appendingPathComponent(".cache/yarn", isDirectory: true)
+
+        try fileManager.createDirectory(at: yarnLibrary, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: yarnDotCache, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 14).write(to: yarnLibrary.appendingPathComponent("yarn1.bin"))
+        try Data(repeating: 1, count: 16).write(to: yarnDotCache.appendingPathComponent("yarn2.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.yarnCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .yarnCaches)
+        XCTAssertEqual(entry.totalSize, 30)
+        XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testPnpmStoreScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let pnpmLibrary = home.appendingPathComponent("Library/pnpm/store", isDirectory: true)
+        let pnpmDotStore = home.appendingPathComponent(".pnpm-store", isDirectory: true)
+
+        try fileManager.createDirectory(at: pnpmLibrary, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: pnpmDotStore, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 18).write(to: pnpmLibrary.appendingPathComponent("pnpm1.bin"))
+        try Data(repeating: 1, count: 21).write(to: pnpmDotStore.appendingPathComponent("pnpm2.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.pnpmStore],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .pnpmStore)
+        XCTAssertEqual(entry.totalSize, 39)
+        XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testXcodeArchivesScanFindsPath() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let archives = home.appendingPathComponent("Library/Developer/Xcode/Archives", isDirectory: true)
+
+        try fileManager.createDirectory(at: archives, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+        try Data(repeating: 1, count: 27).write(to: archives.appendingPathComponent("archive.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.xcodeArchives],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .xcodeArchives)
+        XCTAssertEqual(entry.totalSize, 27)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
+    func testNixScanFindsUserNixCaches() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let dotCacheNix = home.appendingPathComponent(".cache/nix", isDirectory: true)
+        let localStateNix = home.appendingPathComponent(".local/state/nix", isDirectory: true)
+        let libraryCacheNix = home.appendingPathComponent("Library/Caches/nix", isDirectory: true)
+
+        try fileManager.createDirectory(at: dotCacheNix, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: localStateNix, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: libraryCacheNix, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 11).write(to: dotCacheNix.appendingPathComponent("cache.bin"))
+        try Data(repeating: 1, count: 22).write(to: localStateNix.appendingPathComponent("state.bin"))
+        try Data(repeating: 1, count: 33).write(to: libraryCacheNix.appendingPathComponent("index.bin"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.nixCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .nixCaches)
+        XCTAssertEqual(entry.totalSize, 66)
+        XCTAssertEqual(entry.fileCount, 3)
     }
 
     func testAndroidStudioScanFindsGoogleAndJetBrainsDirectories() throws {
@@ -422,6 +680,34 @@ final class CleanMacNasioTests: XCTestCase {
         viewModel.clearSelection()
         XCTAssertFalse(viewModel.hasSelection)
         XCTAssertEqual(viewModel.selectedTotalSize, 0)
+    }
+
+    @MainActor
+    func testViewModelRequiresConfirmationForXcodeArchivesClean() {
+        let home = URL(fileURLWithPath: "/tmp/home")
+        let archiveEntry = makeScanEntry(location: .xcodeArchives, home: home, totalSize: 120, fileCount: 1)
+        let service = FakeJunkCleaningService(
+            scanEntries: [makeScanEntry(location: .caches, home: home, totalSize: 0, fileCount: 0)],
+            cleanSummary: JunkCleanSummary(results: [
+                JunkCleanEntryResult(location: .xcodeArchives, deletedItems: 1, freedSize: 120, errors: [])
+            ])
+        )
+        let viewModel = ContentViewModel(
+            cleanerService: service,
+            bookmarkStore: FakeBookmarkStore(url: home),
+            exclusionStore: FakeExclusionStore(paths: []),
+            homeDirectoryURL: home,
+            scanEntries: [archiveEntry]
+        )
+
+        viewModel.toggleSelection(for: archiveEntry.id)
+        viewModel.cleanSelected()
+        XCTAssertTrue(viewModel.showArchiveCleanConfirmation)
+        XCTAssertEqual(service.cleanCallCount, 0)
+
+        viewModel.confirmCleanSelectedIncludingArchives()
+        XCTAssertFalse(viewModel.showArchiveCleanConfirmation)
+        XCTAssertEqual(service.cleanCallCount, 1)
     }
 }
 

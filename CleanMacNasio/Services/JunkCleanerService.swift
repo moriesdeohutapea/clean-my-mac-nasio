@@ -1,8 +1,6 @@
 //
-//  JunkCleanerService.swift
-//  CleanMacNasio
-//
-//  Created by Mories Hutapea on 19/07/25.
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
 //
 
 import Foundation
@@ -14,7 +12,15 @@ enum JunkLocation: String, CaseIterable, Identifiable {
     case androidStudioCaches
     case gradleCaches
     case flutterCaches
+    case xcodeDerivedData
+    case xcodeArchives
+    case cocoaPodsCaches
+    case swiftPMCaches
+    case npmCaches
+    case yarnCaches
+    case pnpmStore
     case homebrewCaches
+    case nixCaches
     case trash
 
     var id: String { rawValue }
@@ -33,8 +39,24 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Gradle Caches"
         case .flutterCaches:
             return "Flutter Caches"
+        case .xcodeDerivedData:
+            return "Xcode DerivedData"
+        case .xcodeArchives:
+            return "Xcode Archives"
+        case .cocoaPodsCaches:
+            return "CocoaPods Caches"
+        case .swiftPMCaches:
+            return "SwiftPM Caches"
+        case .npmCaches:
+            return "npm Caches"
+        case .yarnCaches:
+            return "Yarn Caches"
+        case .pnpmStore:
+            return "pnpm Store"
         case .homebrewCaches:
             return "Homebrew Caches"
+        case .nixCaches:
+            return "Nix Caches"
         case .trash:
             return "Trash"
         }
@@ -46,7 +68,7 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Library/Caches"
         case .logs:
             return "Library/Logs"
-        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .homebrewCaches, .trash:
+        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .xcodeDerivedData, .xcodeArchives, .cocoaPodsCaches, .swiftPMCaches, .npmCaches, .yarnCaches, .pnpmStore, .homebrewCaches, .nixCaches, .trash:
             return nil
         }
     }
@@ -77,11 +99,47 @@ enum JunkLocation: String, CaseIterable, Identifiable {
                 homeDirectory.appendingPathComponent("Library/Caches/dart"),
                 homeDirectory.appendingPathComponent("Library/Caches/pub")
             ])
+        case .xcodeDerivedData:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Developer/Xcode/DerivedData")
+            ])
+        case .xcodeArchives:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Developer/Xcode/Archives")
+            ])
+        case .cocoaPodsCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Caches/CocoaPods")
+            ])
+        case .swiftPMCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Caches/org.swift.swiftpm")
+            ])
+        case .npmCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".npm")
+            ])
+        case .yarnCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Caches/Yarn"),
+                homeDirectory.appendingPathComponent(".cache/yarn")
+            ])
+        case .pnpmStore:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/pnpm/store"),
+                homeDirectory.appendingPathComponent(".pnpm-store")
+            ])
         case .homebrewCaches:
             return compactUniqueDirectories([
                 homeDirectory.appendingPathComponent("Library/Caches/Homebrew"),
                 homeDirectory.appendingPathComponent(".cache/Homebrew"),
                 URL(fileURLWithPath: "/Library/Caches/Homebrew", isDirectory: true)
+            ])
+        case .nixCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent(".cache/nix"),
+                homeDirectory.appendingPathComponent(".local/state/nix"),
+                homeDirectory.appendingPathComponent("Library/Caches/nix")
             ])
         case .trash:
             return compactUniqueDirectories([

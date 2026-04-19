@@ -1,14 +1,9 @@
+//
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
+//
+
 import SwiftUI
-
-private enum AppMetadata {
-    static var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "-"
-    }
-
-    static var buildNumber: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "-"
-    }
-}
 
 struct DashboardHeader: View {
     let homePath: String?
@@ -367,110 +362,5 @@ struct StatusPanel: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(DashboardStyle.border, lineWidth: 1)
         )
-    }
-}
-
-struct AboutAppPanel: View {
-    @State private var showDetail = false
-
-    private let supportedTargets: [String] = [
-        "Library Caches",
-        "Library Logs",
-        "Temporary Directory",
-        "Android Studio Caches",
-        "Gradle Caches (per version + wrapper)",
-        "Flutter/Dart Caches",
-        "Homebrew Caches",
-        "Trash"
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("About CleanMacNasio")
-                .font(.system(size: 14, weight: .semibold))
-
-            aboutRow(label: "App", value: "CleanMacNasio")
-            aboutRow(label: "Version", value: "\(AppMetadata.appVersion) (\(AppMetadata.buildNumber))")
-
-            Button("Show Full About") {
-                showDetail = true
-            }
-            .controlSize(.small)
-        }
-        .padding(16)
-        .background(DashboardStyle.panel, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(DashboardStyle.border, lineWidth: 1)
-        )
-        .sheet(isPresented: $showDetail) {
-            AboutDetailView(
-                versionText: "\(AppMetadata.appVersion) (\(AppMetadata.buildNumber))",
-                supportedTargets: supportedTargets
-            )
-        }
-    }
-
-    private func aboutRow(label: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(DashboardStyle.mutedText)
-            Text(value)
-                .font(.system(size: 12, weight: .medium))
-                .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-}
-
-private struct AboutDetailView: View {
-    let versionText: String
-    let supportedTargets: [String]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("About CleanMacNasio")
-                .font(.title3)
-                .fontWeight(.bold)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    sectionTitle("App Information")
-                    detailText("Name: CleanMacNasio")
-                    detailText("Version: \(versionText)")
-                    detailText("Scan Mode: Auto-scan lokasi cache umum saat tombol Scan ditekan.")
-                    detailText("Delete Mode: Hanya item yang dipilih user.")
-
-                    sectionTitle("Supported Clean Targets")
-                    ForEach(supportedTargets, id: \.self) { target in
-                        detailText("• \(target)")
-                    }
-
-                    sectionTitle("Safety Rules")
-                    detailText("Excluded path tidak akan dihapus.")
-                    detailText("Proteksi default aktif untuk: .ssh, Keychains, Provisioning Profiles, .git, ekstensi sensitif (jks, keystore, p12, cer, pem, key, mobileprovision, db, sqlite, sqlite3).")
-
-                    sectionTitle("Workflow")
-                    detailText("1. Tekan Scan untuk deteksi multi-path cache umum.")
-                    detailText("2. Pilih target yang ingin dibersihkan.")
-                    detailText("3. Tekan Clean Selected untuk hapus item terpilih.")
-                    detailText("4. Pantau progress scan dan delete pada status panel.")
-                }
-            }
-        }
-        .padding(20)
-        .frame(minWidth: 560, minHeight: 520, alignment: .topLeading)
-    }
-
-    private func sectionTitle(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 13, weight: .semibold))
-            .foregroundColor(DashboardStyle.mutedText)
-    }
-
-    private func detailText(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 13, weight: .medium))
-            .fixedSize(horizontal: false, vertical: true)
     }
 }

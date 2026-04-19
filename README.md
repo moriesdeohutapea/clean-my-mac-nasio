@@ -14,10 +14,18 @@ CleanMacNasio is a macOS SwiftUI utility to scan common developer junk locations
 ## Supported Clean Targets
 
 - `~/Library/Caches`
+- Xcode DerivedData (`~/Library/Developer/Xcode/DerivedData`)
+- Xcode Archives (`~/Library/Developer/Xcode/Archives`) - requires confirmation before delete
+- CocoaPods caches (`~/Library/Caches/CocoaPods`)
+- SwiftPM caches (`~/Library/Caches/org.swift.swiftpm`)
+- npm caches (`~/.npm`)
+- Yarn caches (`~/Library/Caches/Yarn`, `~/.cache/yarn`)
+- pnpm store (`~/Library/pnpm/store`, `~/.pnpm-store`)
 - Android Studio caches (Google and JetBrains paths)
 - Gradle caches and wrapper
 - Flutter caches
 - Homebrew caches
+- Nix caches (`~/.cache/nix`, `~/.local/state/nix`, `~/Library/Caches/nix`)
 - `~/.Trash`
 
 ## Tech Stack

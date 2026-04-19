@@ -1,8 +1,6 @@
 //
-//  CleanMacNasioApp.swift
-//  CleanMacNasio
-//
-//  Created by Mories Hutapea on 19/07/25.
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
 //
 
 import SwiftUI
@@ -13,5 +11,10 @@ struct CleanMacNasioApp: App {
         WindowGroup {
             ContentView()
         }
+
+        Window("About CleanMacNasio", id: "about-window") {
+            AboutWindowView()
+        }
+        .windowResizability(.contentSize)
     }
 }

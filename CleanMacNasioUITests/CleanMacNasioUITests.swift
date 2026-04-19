@@ -1,8 +1,6 @@
 //
-//  CleanMacNasioUITests.swift
-//  CleanMacNasioUITests
-//
-//  Created by Mories Hutapea on 19/07/25.
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
 //
 
 import XCTest
@@ -20,5 +18,18 @@ final class CleanMacNasioUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["CleanMacNasio"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Scan"].exists)
+    }
+
+    @MainActor
+    func testOpenAboutWindowShowsDetailedSections() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let showAboutButton = app.buttons["Show Full About"].firstMatch
+        XCTAssertTrue(showAboutButton.waitForExistence(timeout: 5))
+        showAboutButton.tap()
+
+        XCTAssertTrue(app.staticTexts["Ringkasan"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Target & Lokasi Scan"].exists)
     }
 }

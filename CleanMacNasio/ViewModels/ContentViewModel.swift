@@ -1,13 +1,26 @@
+//
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
+//
+
 import Foundation
 
 @MainActor
 final class ContentViewModel: ObservableObject {
     nonisolated private static let activeScanLocations: [JunkLocation] = [
         .caches,
+        .xcodeDerivedData,
+        .xcodeArchives,
+        .cocoaPodsCaches,
+        .swiftPMCaches,
+        .npmCaches,
+        .yarnCaches,
+        .pnpmStore,
         .androidStudioCaches,
         .gradleCaches,
         .flutterCaches,
         .homebrewCaches,
+        .nixCaches,
         .trash
     ]
 
@@ -24,6 +37,7 @@ final class ContentViewModel: ObservableObject {
     @Published var cleanProgressFraction: Double
     @Published var isScanning = false
     @Published var isCleaning = false
+    @Published var showArchiveCleanConfirmation = false
 
     private let cleanerService: JunkCleaningServicing
     private let bookmarkStore: SecurityScopedBookmarkStoring
@@ -237,6 +251,29 @@ final class ContentViewModel: ObservableObject {
         guard !selectedEntries.isEmpty, let homeDirectoryURL else { return }
 
         let entriesToClean = selectedEntries
+        if entriesToClean.contains(where: { $0.location == .xcodeArchives }) {
+            showArchiveCleanConfirmation = true
+            return
+        }
+
+        runClean(entriesToClean: entriesToClean, homeDirectoryURL: homeDirectoryURL)
+    }
+
+    func confirmCleanSelectedIncludingArchives() {
+        guard !selectedEntries.isEmpty, let homeDirectoryURL else {
+            showArchiveCleanConfirmation = false
+            return
+        }
+
+        showArchiveCleanConfirmation = false
+        runClean(entriesToClean: selectedEntries, homeDirectoryURL: homeDirectoryURL)
+    }
+
+    func cancelCleanSelectedIncludingArchives() {
+        showArchiveCleanConfirmation = false
+    }
+
+    private func runClean(entriesToClean: [JunkScanEntry], homeDirectoryURL: URL) {
         let currentExcludedPaths = Set(excludedPaths)
 
         isCleaning = true

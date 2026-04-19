@@ -1,3 +1,8 @@
+//
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
+//
+
 import Foundation
 
 protocol ExclusionStoring {

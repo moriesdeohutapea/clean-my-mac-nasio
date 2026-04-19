@@ -1,3 +1,8 @@
+//
+//  Created by Mories Hutapea,S.E.,S.Kom
+//  Date: 2026-04-19
+//
+
 import SwiftUI
 
 extension ContentView {
@@ -48,6 +53,99 @@ extension ContentView {
                 excludedItemsCount: 0
             ),
             JunkScanEntry(
+                location: .xcodeDerivedData,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/Library/Developer/Xcode/DerivedData")
+                ],
+                totalSize: 1_430_120_000,
+                fileCount: 210,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/Library/Developer/Xcode/DerivedData/App-abc123", size: 730_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
+                location: .xcodeArchives,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/Library/Developer/Xcode/Archives")
+                ],
+                totalSize: 920_220_000,
+                fileCount: 7,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/Library/Developer/Xcode/Archives/2026-04-10/App.xcarchive", size: 410_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
+                location: .cocoaPodsCaches,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/Library/Caches/CocoaPods")
+                ],
+                totalSize: 188_500_000,
+                fileCount: 92,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/Library/Caches/CocoaPods/Pods/Release.zip", size: 90_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
+                location: .swiftPMCaches,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/Library/Caches/org.swift.swiftpm")
+                ],
+                totalSize: 240_700_000,
+                fileCount: 58,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/Library/Caches/org.swift.swiftpm/repositories", size: 130_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
+                location: .npmCaches,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/.npm")
+                ],
+                totalSize: 180_400_000,
+                fileCount: 120,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/.npm/_cacache/index-v5", size: 95_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
+                location: .yarnCaches,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/Library/Caches/Yarn"),
+                    URL(fileURLWithPath: "/Users/yourname/.cache/yarn")
+                ],
+                totalSize: 152_250_000,
+                fileCount: 88,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/Library/Caches/Yarn/v6", size: 80_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
+                location: .pnpmStore,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/Library/pnpm/store"),
+                    URL(fileURLWithPath: "/Users/yourname/.pnpm-store")
+                ],
+                totalSize: 201_500_000,
+                fileCount: 96,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/Library/pnpm/store/v3/files", size: 111_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
                 location: .homebrewCaches,
                 directoryURLs: [
                     URL(fileURLWithPath: "/Users/yourname/Library/Caches/Homebrew"),
@@ -58,6 +156,20 @@ extension ContentView {
                 errorMessage: nil,
                 previewItems: [
                     JunkPreviewItem(path: "/Users/yourname/Library/Caches/Homebrew/downloads/ruby-3.3.tar.gz", size: 220_000_000)
+                ],
+                excludedItemsCount: 0
+            ),
+            JunkScanEntry(
+                location: .nixCaches,
+                directoryURLs: [
+                    URL(fileURLWithPath: "/Users/yourname/.cache/nix"),
+                    URL(fileURLWithPath: "/Users/yourname/.local/state/nix")
+                ],
+                totalSize: 210_600_000,
+                fileCount: 37,
+                errorMessage: nil,
+                previewItems: [
+                    JunkPreviewItem(path: "/Users/yourname/.cache/nix/binary-cache-v6.sqlite", size: 120_000_000)
                 ],
                 excludedItemsCount: 0
             ),
@@ -121,7 +233,7 @@ extension ContentView {
             previewExcludedPaths: sampleExcludedPaths,
             previewLogMessage: "Scanning lokasi junk...",
             previewIsScanning: true,
-            previewScanProgressMessage: "Step 3/6: Gradle Caches",
+            previewScanProgressMessage: "Step 9/14: Android Studio Caches",
             previewScanProgressDetail: "~/.gradle/caches, ~/.gradle/wrapper",
             previewScanProgressFraction: 0.5
         )

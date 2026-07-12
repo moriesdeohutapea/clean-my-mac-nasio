@@ -256,32 +256,40 @@ extension ContentView {
     }
 }
 
-#Preview("Layout Preview") {
-    ContentView.previewContent
-        .frame(width: 1200, height: 760)
-        .preferredColorScheme(.light)
-}
+#if DEBUG
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            ContentView.previewContent
+                .frame(width: 1200, height: 760)
+                .preferredColorScheme(.light)
+                .previewDisplayName("Layout Preview")
 
-#Preview("Empty State") {
-    ContentView.previewEmptyState
-        .frame(width: 1200, height: 760)
-        .preferredColorScheme(.light)
-}
+            ContentView.previewContent
+                .frame(width: 480, height: 760)
+                .preferredColorScheme(.light)
+                .previewDisplayName("Compact Layout")
 
-#Preview("Selected State") {
-    ContentView.previewSelectionState
-        .frame(width: 1200, height: 760)
-        .preferredColorScheme(.light)
-}
+            ContentView.previewEmptyState
+                .frame(width: 1200, height: 760)
+                .preferredColorScheme(.light)
+                .previewDisplayName("Empty State")
 
-#Preview("Scanning State") {
-    ContentView.previewScanningState
-        .frame(width: 1200, height: 760)
-        .preferredColorScheme(.light)
-}
+            ContentView.previewSelectionState
+                .frame(width: 1200, height: 760)
+                .preferredColorScheme(.light)
+                .previewDisplayName("Selected State")
 
-#Preview("Cleaning/Error State") {
-    ContentView.previewCleaningState
-        .frame(width: 1200, height: 760)
-        .preferredColorScheme(.light)
+            ContentView.previewScanningState
+                .frame(width: 1200, height: 760)
+                .preferredColorScheme(.light)
+                .previewDisplayName("Scanning State")
+
+            ContentView.previewCleaningState
+                .frame(width: 1200, height: 760)
+                .preferredColorScheme(.light)
+                .previewDisplayName("Cleaning/Error State")
+        }
+    }
 }
+#endif

@@ -16,63 +16,94 @@ struct DashboardHeader: View {
     let onScan: () -> Void
     let onStopScan: () -> Void
     let canScan: Bool
+    let isCompact: Bool
 
     var body: some View {
-        HStack(alignment: .center, spacing: 18) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 10) {
-                    Text("CleanMacNasio")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                    StatusPill(text: statusText, isBusy: isBusy)
-                }
+        Group {
+            if isCompact {
+                VStack(alignment: .leading, spacing: 14) {
+                    titleSection
+                    actionButtons
 
-                Text(homePath ?? "Press Scan to check common cache locations in Home directory.")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(DashboardStyle.mutedText)
-                    .lineLimit(2)
-            }
-
-            Spacer()
-
-            HStack(spacing: 10) {
-                Button("Scan", action: onScan)
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                    .controlSize(.large)
-                    .disabled(!canScan)
-
-                if isScanning {
-                    Button("Stop", action: onStopScan)
-                        .buttonStyle(.borderedProminent)
-                        .tint(.red)
-                        .controlSize(.large)
-                }
-            }
-
-            if isScanning {
-                VStack(alignment: .trailing, spacing: 6) {
-                    ProgressView(value: scanProgressFraction, total: 1.0)
-                        .controlSize(.small)
-                    Text(scanProgressMessage.isEmpty ? "Scanning..." : scanProgressMessage)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(DashboardStyle.mutedText)
-                        .lineLimit(1)
-                    if !scanProgressDetail.isEmpty {
-                        Text(scanProgressDetail)
-                            .font(.system(size: 11, weight: .regular, design: .monospaced))
-                            .foregroundColor(DashboardStyle.mutedText)
-                            .lineLimit(2)
+                    if isScanning {
+                        scanProgress
                     }
                 }
-                .frame(width: 420, alignment: .trailing)
+            } else {
+                HStack(alignment: .center, spacing: 18) {
+                    titleSection
+
+                    Spacer()
+
+                    actionButtons
+
+                    if isScanning {
+                        scanProgress
+                            .frame(width: DashboardLayout.scanProgressWidth, alignment: .trailing)
+                    }
+                }
             }
         }
-        .padding(22)
+        .padding(isCompact ? DashboardLayout.compactHeaderPadding : DashboardLayout.regularHeaderPadding)
         .background(DashboardStyle.panel, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(DashboardStyle.border, lineWidth: 1)
         )
+    }
+
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Text("CleanMacNasio")
+                    .font(.system(
+                        size: isCompact ? DashboardLayout.compactHeaderTitleSize : DashboardLayout.regularHeaderTitleSize,
+                        weight: .bold,
+                        design: .rounded
+                    ))
+                StatusPill(text: statusText, isBusy: isBusy)
+            }
+
+            Text(homePath ?? "Press Scan to check safe log and cache locations in Home directory.")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(DashboardStyle.mutedText)
+                .lineLimit(2)
+        }
+    }
+
+    private var actionButtons: some View {
+        HStack(spacing: 10) {
+            Button("Scan", action: onScan)
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .controlSize(.large)
+                .disabled(!canScan)
+
+            if isScanning {
+                Button("Stop", action: onStopScan)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                    .controlSize(.large)
+            }
+        }
+    }
+
+    private var scanProgress: some View {
+        VStack(alignment: isCompact ? .leading : .trailing, spacing: 6) {
+            ProgressView(value: scanProgressFraction, total: 1.0)
+                .controlSize(.small)
+            Text(scanProgressMessage.isEmpty ? "Scanning..." : scanProgressMessage)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(DashboardStyle.mutedText)
+                .lineLimit(1)
+            if !scanProgressDetail.isEmpty {
+                Text(scanProgressDetail)
+                    .font(.system(size: 11, weight: .regular, design: .monospaced))
+                    .foregroundColor(DashboardStyle.mutedText)
+                    .lineLimit(2)
+            }
+        }
+        .frame(maxWidth: isCompact ? .infinity : nil, alignment: isCompact ? .leading : .trailing)
     }
 }
 
@@ -145,7 +176,7 @@ struct EmptyScanState: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("No scan result yet")
                 .font(.headline)
-            Text("Press Scan to check common cache locations and review detected junk.")
+            Text("Press Scan to check safe log and cache locations, then review detected items.")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(DashboardStyle.mutedText)
         }
@@ -283,19 +314,157 @@ struct ExcludedPathsPanel: View {
     let onRemove: (String) -> Void
 
     var body: some View {
+        PathManagementPanel(
+            paths: excludedPaths,
+            addButtonTitle: "Add Exclude Path",
+            emptyMessage: "No protected path yet.",
+            note: nil,
+            onAdd: onAdd,
+            onRemove: onRemove
+        )
+    }
+}
+
+struct CustomCleanupTargetsPanel: View {
+    let targetPaths: [String]
+    let onAdd: () -> Void
+    let onRemove: (String) -> Void
+
+    var body: some View {
+        PathManagementPanel(
+            paths: targetPaths,
+            addButtonTitle: "Add Custom Folder",
+            emptyMessage: "No custom folder yet.",
+            note: "Custom targets are never selected automatically.",
+            onAdd: onAdd,
+            onRemove: onRemove
+        )
+    }
+}
+
+struct AppCacheRecommendationsPanel: View {
+    let recommendations: [JunkCleanerService.AppCacheRecommendation]
+    let customTargetPaths: [String]
+    let onAdd: ([URL]) -> Void
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Button("Add Exclude Path", action: onAdd)
+            if recommendations.isEmpty {
+                Text("Tidak ada rekomendasi cache yang terdeteksi.")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(DashboardStyle.mutedText)
+                    .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(recommendations) { recommendation in
+                        RecommendationCard(
+                            recommendation: recommendation,
+                            isDisabled: recommendation.directoryURLs.allSatisfy {
+                                customTargetPaths.contains(JunkCleanerService.normalizePath($0.path))
+                            },
+                            customTargetPaths: customTargetPaths,
+                            onAdd: onAdd
+                        )
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(DashboardStyle.panel, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(DashboardStyle.border, lineWidth: 1)
+        )
+    }
+}
+
+private struct RecommendationCard: View {
+    let recommendation: JunkCleanerService.AppCacheRecommendation
+    let isDisabled: Bool
+    let customTargetPaths: [String]
+    let onAdd: ([URL]) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(recommendation.appName)
+                        .font(.system(size: 14, weight: .bold))
+                    Text("\(recommendation.directoryURLs.count) folder • \(recommendation.formattedSizeText) • \(recommendation.fileCount) files")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(DashboardStyle.mutedText)
+                }
+
+                Spacer()
+
+                Button(isDisabled ? "Sudah ada" : "Tambah Semua", action: addAllDirectories)
+                    .controlSize(.small)
+                    .disabled(isDisabled)
+            }
+
+            if let note = recommendation.note {
+                Text(note)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(DashboardStyle.mutedText)
+            }
+
+            ForEach(recommendation.directoryURLs, id: \.path) { directory in
+                HStack(spacing: 8) {
+                    Text(directory.path)
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundColor(DashboardStyle.mutedText)
+                        .lineLimit(2)
+                        .truncationMode(.middle)
+
+                    Spacer()
+
+                    Button("Tambah") {
+                        onAdd([directory])
+                    }
+                    .controlSize(.small)
+                    .disabled(customTargetPaths.contains(JunkCleanerService.normalizePath(directory.path)))
+                }
+                .padding(10)
+                .background(DashboardStyle.recessedPanel, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+            }
+        }
+        .padding(12)
+        .background(DashboardStyle.recessedPanel, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+    }
+
+    private func addAllDirectories() {
+        onAdd(recommendation.directoryURLs)
+    }
+}
+
+private struct PathManagementPanel: View {
+    let paths: [String]
+    let addButtonTitle: String
+    let emptyMessage: String
+    let note: String?
+    let onAdd: () -> Void
+    let onRemove: (String) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button(addButtonTitle, action: onAdd)
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            if excludedPaths.isEmpty {
-                Text("No protected path yet.")
+            if let note {
+                Text(note)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(DashboardStyle.mutedText)
+            }
+
+            if paths.isEmpty {
+                Text(emptyMessage)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(DashboardStyle.mutedText)
                     .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
             } else {
                 VStack(spacing: 8) {
-                    ForEach(excludedPaths, id: \.self) { path in
+                    ForEach(paths, id: \.self) { path in
                         HStack(spacing: 8) {
                             Text(path)
                                 .font(.system(size: 12, weight: .medium, design: .monospaced))

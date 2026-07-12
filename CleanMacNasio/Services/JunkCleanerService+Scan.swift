@@ -6,6 +6,25 @@
 import Foundation
 
 extension JunkCleanerService {
+    static func scanCustomTargets(
+        directories: [URL],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry] {
+        let protectedRoots = protectedRootPaths(homeDirectory: homeDirectory)
+
+        return directories.map { directory in
+            buildScanEntry(
+                location: .customCleanupTarget,
+                directories: [directory],
+                excludedPaths: excludedPaths,
+                protectedRootPaths: protectedRoots,
+                shouldCancel: shouldCancel
+            )
+        }
+    }
+
     static func scan(locations: [JunkLocation], homeDirectory: URL, excludedPaths: Set<String>) -> [JunkScanEntry] {
         scan(
             locations: locations,

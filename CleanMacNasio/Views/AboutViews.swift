@@ -61,38 +61,10 @@ private struct AboutDetailView: View {
     let versionText: String
 
     private let targetDetails: [AboutTargetInfo] = [
-        .init(name: "Library Caches", paths: ["~/Library/Caches"]),
         .init(name: "Library Logs", paths: ["~/Library/Logs"]),
-        .init(name: "Temporary Directory", paths: ["/var/folders/... (NSTemporaryDirectory)"]),
-        .init(name: "Xcode DerivedData", paths: ["~/Library/Developer/Xcode/DerivedData"]),
-        .init(name: "Xcode Archives", paths: ["~/Library/Developer/Xcode/Archives"], note: "Perlu konfirmasi khusus sebelum delete."),
-        .init(name: "CocoaPods Caches", paths: ["~/Library/Caches/CocoaPods"]),
-        .init(name: "SwiftPM Caches", paths: ["~/Library/Caches/org.swift.swiftpm"]),
-        .init(name: "npm Caches", paths: ["~/.npm"]),
-        .init(name: "Yarn Caches", paths: ["~/Library/Caches/Yarn", "~/.cache/yarn"]),
-        .init(name: "pnpm Store", paths: ["~/Library/pnpm/store", "~/.pnpm-store"]),
-        .init(name: "Maven Caches", paths: ["~/.m2/repository"]),
-        .init(name: "Ivy Caches", paths: ["~/.ivy2/cache"]),
-        .init(name: "pip Caches", paths: ["~/.cache/pip", "~/Library/Caches/pip"]),
-        .init(name: "Cargo Caches", paths: ["~/.cargo/registry", "~/.cargo/git"]),
-        .init(name: "Docker Caches", paths: ["~/.docker/buildx", "~/Library/Caches/com.docker.docker", "~/Library/Containers/com.docker.docker/Data/log"], note: "Fokus ke cache/log lokal Docker yang umum."),
-        .init(name: "Poetry/Pipenv Caches", paths: ["~/.cache/pypoetry", "~/.local/share/virtualenvs", "~/.cache/pipenv"]),
-        .init(name: "Go Caches", paths: ["~/Library/Caches/go-build", "~/go/pkg/mod"], note: "Go module cache bisa besar; hapus jika siap download ulang dependency."),
-        .init(name: "Ruby/Bundler Caches", paths: ["~/.bundle/cache", "~/.gem"]),
-        .init(name: "Kubernetes/Helm Caches", paths: ["~/.kube/cache", "~/.cache/helm"]),
-        .init(name: "Android Studio Caches", paths: [
-            "~/Library/Caches/Google/AndroidStudio*",
-            "~/Library/Logs/Google/AndroidStudio*",
-            "~/Library/Application Support/Google/AndroidStudio*/{caches,plugins}",
-            "~/Library/Caches/JetBrains/AndroidStudio*",
-            "~/Library/Logs/JetBrains/AndroidStudio*",
-            "~/Library/Application Support/JetBrains/AndroidStudio*/{caches,plugins}"
-        ]),
-        .init(name: "Gradle Caches", paths: ["~/.gradle/caches/<versi>", "~/.gradle/caches/<shared>", "~/.gradle/wrapper"], note: "Ditampilkan per versi + shared + wrapper."),
-        .init(name: "Flutter/Dart Caches", paths: ["~/.pub-cache", "~/.dartServer", "~/Library/Caches/flutter", "~/Library/Caches/dart", "~/Library/Caches/pub"]),
-        .init(name: "Homebrew Caches", paths: ["~/Library/Caches/Homebrew", "~/.cache/Homebrew", "/Library/Caches/Homebrew"]),
-        .init(name: "Nix Caches", paths: ["~/.cache/nix", "~/.local/state/nix", "~/Library/Caches/nix"]),
-        .init(name: "Trash", paths: ["~/.Trash"])
+        .init(name: "Roblox", paths: ["~/Library/Caches/Roblox", "~/Library/Caches/com.roblox.RobloxPlayer", "~/Library/Caches/com.roblox.RobloxStudio", "~/Library/Logs/Roblox"], note: "Cache dan log umum Roblox Player/Studio."),
+        .init(name: "WhatsApp", paths: ["~/Library/Containers/net.whatsapp.WhatsApp/Data/Library/{Caches,Logs}", "~/Library/Caches/WhatsApp", "~/Library/Caches/net.whatsapp.WhatsApp", "~/Library/Logs/WhatsApp", "~/Library/Logs/net.whatsapp.WhatsApp"], note: "Hanya cache dan log WhatsApp Desktop; chat dan media tidak disentuh."),
+        .init(name: "Rekomendasi Cache Aplikasi", paths: ["~/Library/Caches/<AppName>", "~/Library/Application Support/<AppName>/Cache", "~/Library/Logs/<AppName>"], note: "Rekomendasi dibaca dari pola folder cache aplikasi yang umum terpasang.")
     ]
 
     var body: some View {
@@ -113,7 +85,7 @@ private struct AboutDetailView: View {
                     sectionTitle("Ringkasan")
                     detailText("Name: CleanMacNasio")
                     detailText("Version: \(versionText)")
-                    detailText("Fungsi utama: scan cache/junk developer umum dan hapus hanya item yang kamu pilih.")
+                    detailText("Fungsi utama: scan log dan cache aplikasi yang aman dibersihkan, lalu hapus hanya item yang kamu pilih.")
                     detailText("Aplikasi tidak auto-scan saat dibuka. Scan hanya jalan saat tombol Scan ditekan.")
 
                     sectionTitle("Kontak")
@@ -128,6 +100,7 @@ private struct AboutDetailView: View {
                     detailText("4. Tekan Clean Selected untuk hapus kategori terpilih saja.")
                     detailText("5. Pantau progress scan/delete di status panel.")
                     detailText("6. Tombol Stop muncul saat scan berjalan untuk membatalkan proses.")
+                    detailText("7. Tambahkan Custom Target hanya untuk subfolder Home yang aman dibersihkan; target ini tidak ikut Select All.")
 
                     sectionTitle("Target & Lokasi Scan")
                     ForEach(targetDetails) { target in
@@ -136,11 +109,12 @@ private struct AboutDetailView: View {
 
                     sectionTitle("Keamanan")
                     detailText("Excluded path tidak akan dihapus.")
+                    detailText("Custom Target selalu memerlukan konfirmasi sebelum isi folder dihapus.")
                     detailText("Proteksi default aktif untuk path/file sensitif, termasuk: .ssh, Keychains, Provisioning Profiles, .git, serta ekstensi sensitif seperti jks, keystore, p12, cer, pem, key, mobileprovision, db, sqlite, sqlite3.")
                     detailText("Xcode Archives memakai konfirmasi ekstra sebelum proses delete.")
 
                     sectionTitle("Batasan")
-                    detailText("App fokus ke lokasi cache/junk umum developer, bukan file project source.")
+                    detailText("App hanya mencakup log dan cache aplikasi yang dipilih untuk menghindari rebuild atau download dependency yang mahal.")
                     detailText("Folder yang tidak ada akan otomatis dilewati saat scan (tidak dianggap error fatal).")
                     detailText("Hasil scan sangat bergantung pada kondisi path dan izin akses user macOS saat ini.")
                 }
@@ -197,12 +171,18 @@ private struct AboutTargetInfo: Identifiable {
     }
 }
 
-#Preview("About Panel") {
-    AboutAppPanel()
-        .padding()
-        .frame(width: 320)
-}
+#if DEBUG
+struct AboutViews_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            AboutAppPanel()
+                .padding()
+                .frame(width: 320)
+                .previewDisplayName("About Panel")
 
-#Preview("About Window") {
-    AboutWindowView()
+            AboutWindowView()
+                .previewDisplayName("About Window")
+        }
+    }
 }
+#endif

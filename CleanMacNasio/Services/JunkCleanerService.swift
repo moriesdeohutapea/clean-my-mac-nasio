@@ -12,6 +12,10 @@ enum JunkLocation: String, CaseIterable, Identifiable {
     case androidStudioCaches
     case gradleCaches
     case flutterCaches
+    case unityCaches
+    case robloxCaches
+    case whatsAppCaches
+    case customCleanupTarget
     case xcodeDerivedData
     case xcodeArchives
     case cocoaPodsCaches
@@ -48,6 +52,14 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Gradle Caches"
         case .flutterCaches:
             return "Flutter Caches"
+        case .unityCaches:
+            return "Unity"
+        case .robloxCaches:
+            return "Roblox"
+        case .whatsAppCaches:
+            return "WhatsApp"
+        case .customCleanupTarget:
+            return "Custom Cleanup Target"
         case .xcodeDerivedData:
             return "Xcode DerivedData"
         case .xcodeArchives:
@@ -95,7 +107,7 @@ enum JunkLocation: String, CaseIterable, Identifiable {
             return "Library/Caches"
         case .logs:
             return "Library/Logs"
-        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .xcodeDerivedData, .xcodeArchives, .cocoaPodsCaches, .swiftPMCaches, .npmCaches, .yarnCaches, .pnpmStore, .mavenCaches, .ivyCaches, .pipCaches, .cargoCaches, .dockerCaches, .poetryPipenvCaches, .goCaches, .rubyBundlerCaches, .kubernetesHelmCaches, .homebrewCaches, .nixCaches, .trash:
+        case .temporaryDirectory, .androidStudioCaches, .gradleCaches, .flutterCaches, .unityCaches, .robloxCaches, .whatsAppCaches, .customCleanupTarget, .xcodeDerivedData, .xcodeArchives, .cocoaPodsCaches, .swiftPMCaches, .npmCaches, .yarnCaches, .pnpmStore, .mavenCaches, .ivyCaches, .pipCaches, .cargoCaches, .dockerCaches, .poetryPipenvCaches, .goCaches, .rubyBundlerCaches, .kubernetesHelmCaches, .homebrewCaches, .nixCaches, .trash:
             return nil
         }
     }
@@ -126,6 +138,31 @@ enum JunkLocation: String, CaseIterable, Identifiable {
                 homeDirectory.appendingPathComponent("Library/Caches/dart"),
                 homeDirectory.appendingPathComponent("Library/Caches/pub")
             ])
+        case .unityCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Unity/cache"),
+                homeDirectory.appendingPathComponent("Library/Caches/Unity"),
+                homeDirectory.appendingPathComponent("Library/Logs/Unity"),
+                homeDirectory.appendingPathComponent("Library/Application Support/UnityHub/logs")
+            ])
+        case .robloxCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Caches/Roblox"),
+                homeDirectory.appendingPathComponent("Library/Caches/com.roblox.RobloxPlayer"),
+                homeDirectory.appendingPathComponent("Library/Caches/com.roblox.RobloxStudio"),
+                homeDirectory.appendingPathComponent("Library/Logs/Roblox")
+            ])
+        case .whatsAppCaches:
+            return compactUniqueDirectories([
+                homeDirectory.appendingPathComponent("Library/Containers/net.whatsapp.WhatsApp/Data/Library/Caches"),
+                homeDirectory.appendingPathComponent("Library/Containers/net.whatsapp.WhatsApp/Data/Library/Logs"),
+                homeDirectory.appendingPathComponent("Library/Caches/WhatsApp"),
+                homeDirectory.appendingPathComponent("Library/Caches/net.whatsapp.WhatsApp"),
+                homeDirectory.appendingPathComponent("Library/Logs/WhatsApp"),
+                homeDirectory.appendingPathComponent("Library/Logs/net.whatsapp.WhatsApp")
+            ])
+        case .customCleanupTarget:
+            return []
         case .xcodeDerivedData:
             return compactUniqueDirectories([
                 homeDirectory.appendingPathComponent("Library/Developer/Xcode/DerivedData")
@@ -297,6 +334,10 @@ struct JunkScanEntry: Identifiable {
     }
 
     var displayTitle: String {
+        if location == .customCleanupTarget, let directory = directoryURLs.first {
+            return "Custom: \(directory.lastPathComponent)"
+        }
+
         guard location == .gradleCaches else {
             return location.title
         }
@@ -353,6 +394,12 @@ protocol JunkCleaningServicing: Sendable {
         excludedPaths: Set<String>,
         shouldCancel: @escaping @Sendable () -> Bool
     ) -> [JunkScanEntry]
+    func scanCustomTargets(
+        directories: [URL],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry]
     func clean(entries: [JunkScanEntry], excludedPaths: Set<String>) -> JunkCleanSummary
 }
 
@@ -365,6 +412,15 @@ extension JunkCleaningServicing {
     ) -> [JunkScanEntry] {
         guard !shouldCancel() else { return [] }
         return scan(locations: locations, homeDirectory: homeDirectory, excludedPaths: excludedPaths)
+    }
+
+    func scanCustomTargets(
+        directories: [URL],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry] {
+        []
     }
 }
 
@@ -464,6 +520,20 @@ extension JunkCleanerService: JunkCleaningServicing {
     ) -> [JunkScanEntry] {
         Self.scan(
             locations: locations,
+            homeDirectory: homeDirectory,
+            excludedPaths: excludedPaths,
+            shouldCancel: shouldCancel
+        )
+    }
+
+    func scanCustomTargets(
+        directories: [URL],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry] {
+        Self.scanCustomTargets(
+            directories: directories,
             homeDirectory: homeDirectory,
             excludedPaths: excludedPaths,
             shouldCancel: shouldCancel

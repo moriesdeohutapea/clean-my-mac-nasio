@@ -84,6 +84,30 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertEqual(entry.fileCount, 1)
     }
 
+    func testCustomTargetScanFindsSelectedDirectory() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let customTarget = home.appendingPathComponent("Library/Logs/CustomApp", isDirectory: true)
+        try fileManager.createDirectory(at: customTarget, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 42).write(to: customTarget.appendingPathComponent("custom.log"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scanCustomTargets(
+                directories: [customTarget],
+                homeDirectory: home,
+                excludedPaths: [],
+                shouldCancel: { false }
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .customCleanupTarget)
+        XCTAssertEqual(entry.displayTitle, "Custom: CustomApp")
+        XCTAssertEqual(entry.totalSize, 42)
+        XCTAssertEqual(entry.fileCount, 1)
+    }
+
     func testTemporaryDirectoryResolvePointsToSystemTemp() {
         let home = URL(fileURLWithPath: "/tmp/fake-home", isDirectory: true)
         let directories = JunkLocation.temporaryDirectory.resolveDirectories(homeDirectory: home)
@@ -119,6 +143,131 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertEqual(entry.location, .flutterCaches)
         XCTAssertEqual(entry.totalSize, 40)
         XCTAssertEqual(entry.fileCount, 2)
+    }
+
+    func testUnityScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let unityCache = home.appendingPathComponent("Library/Unity/cache", isDirectory: true)
+        let unityCacheMirror = home.appendingPathComponent("Library/Caches/Unity", isDirectory: true)
+        let unityLogs = home.appendingPathComponent("Library/Logs/Unity", isDirectory: true)
+        let unityHubLogs = home.appendingPathComponent("Library/Application Support/UnityHub/logs", isDirectory: true)
+
+        try fileManager.createDirectory(at: unityCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: unityCacheMirror, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: unityLogs, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: unityHubLogs, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 10).write(to: unityCache.appendingPathComponent("cache.bin"))
+        try Data(repeating: 1, count: 20).write(to: unityCacheMirror.appendingPathComponent("mirror.bin"))
+        try Data(repeating: 1, count: 30).write(to: unityLogs.appendingPathComponent("editor.log"))
+        try Data(repeating: 1, count: 40).write(to: unityHubLogs.appendingPathComponent("hub.log"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.unityCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .unityCaches)
+        XCTAssertEqual(entry.totalSize, 100)
+        XCTAssertEqual(entry.fileCount, 4)
+    }
+
+    func testRobloxScanFindsPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let robloxCache = home.appendingPathComponent("Library/Caches/Roblox", isDirectory: true)
+        let robloxPlayerCache = home.appendingPathComponent("Library/Caches/com.roblox.RobloxPlayer", isDirectory: true)
+        let robloxStudioCache = home.appendingPathComponent("Library/Caches/com.roblox.RobloxStudio", isDirectory: true)
+        let robloxLogs = home.appendingPathComponent("Library/Logs/Roblox", isDirectory: true)
+
+        try fileManager.createDirectory(at: robloxCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: robloxPlayerCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: robloxStudioCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: robloxLogs, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 11).write(to: robloxCache.appendingPathComponent("cache.bin"))
+        try Data(repeating: 1, count: 22).write(to: robloxPlayerCache.appendingPathComponent("player.bin"))
+        try Data(repeating: 1, count: 33).write(to: robloxStudioCache.appendingPathComponent("studio.bin"))
+        try Data(repeating: 1, count: 44).write(to: robloxLogs.appendingPathComponent("roblox.log"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.robloxCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .robloxCaches)
+        XCTAssertEqual(entry.totalSize, 110)
+        XCTAssertEqual(entry.fileCount, 4)
+    }
+
+    func testWhatsAppScanFindsCacheAndLogPaths() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let containerCache = home.appendingPathComponent("Library/Containers/net.whatsapp.WhatsApp/Data/Library/Caches", isDirectory: true)
+        let containerLogs = home.appendingPathComponent("Library/Containers/net.whatsapp.WhatsApp/Data/Library/Logs", isDirectory: true)
+        let desktopCache = home.appendingPathComponent("Library/Caches/WhatsApp", isDirectory: true)
+        let desktopLogs = home.appendingPathComponent("Library/Logs/WhatsApp", isDirectory: true)
+
+        try fileManager.createDirectory(at: containerCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: containerLogs, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: desktopCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: desktopLogs, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 12).write(to: containerCache.appendingPathComponent("cache.bin"))
+        try Data(repeating: 1, count: 24).write(to: containerLogs.appendingPathComponent("app.log"))
+        try Data(repeating: 1, count: 36).write(to: desktopCache.appendingPathComponent("desktop-cache.bin"))
+        try Data(repeating: 1, count: 48).write(to: desktopLogs.appendingPathComponent("desktop.log"))
+
+        let entry = try XCTUnwrap(
+            JunkCleanerService.scan(
+                locations: [.whatsAppCaches],
+                homeDirectory: home,
+                excludedPaths: []
+            ).first
+        )
+
+        XCTAssertEqual(entry.location, .whatsAppCaches)
+        XCTAssertEqual(entry.totalSize, 120)
+        XCTAssertEqual(entry.fileCount, 4)
+    }
+
+    func testRecommendationDetectionFindsInstalledAppCaches() throws {
+        let fileManager = FileManager.default
+        let home = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let discordCache = home.appendingPathComponent("Library/Caches/com.hnc.Discord", isDirectory: true)
+        let slackLog = home.appendingPathComponent("Library/Logs/Slack", isDirectory: true)
+        let telegramCache = home.appendingPathComponent("Library/Caches/com.tdesktop.Telegram", isDirectory: true)
+
+        try fileManager.createDirectory(at: discordCache, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: slackLog, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: telegramCache, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: home) }
+
+        try Data(repeating: 1, count: 13).write(to: discordCache.appendingPathComponent("cache.bin"))
+        try Data(repeating: 1, count: 23).write(to: slackLog.appendingPathComponent("log.bin"))
+        try Data(repeating: 1, count: 31).write(to: telegramCache.appendingPathComponent("tg.bin"))
+
+        let recommendations = JunkCleanerService.detectInstalledAppCacheRecommendations(homeDirectory: home)
+
+        let names = Set(recommendations.map(\.appName))
+        XCTAssertTrue(names.contains("Discord"))
+        XCTAssertTrue(names.contains("Slack"))
+        XCTAssertTrue(names.contains("Telegram"))
+        XCTAssertEqual(recommendations.count, 3)
+
+        let discord = try XCTUnwrap(recommendations.first(where: { $0.appName == "Discord" }))
+        XCTAssertEqual(discord.directoryURLs.first?.path, discordCache.path)
+        XCTAssertEqual(discord.fileCount, 1)
     }
 
     func testCleanSkipsExcludedItems() throws {
@@ -178,6 +327,17 @@ final class CleanMacNasioTests: XCTestCase {
         store.save(["/z", "/a", "/z"])
 
         XCTAssertEqual(store.load(), ["/a", "/z"])
+    }
+
+    func testCustomTargetStoreDeduplicatesNormalizesAndSortsPaths() {
+        let suiteName = "CleanMacNasioTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let store = CustomTargetStore(userDefaults: defaults)
+        store.save(["/tmp/z/../z", "/tmp/a", "/tmp/z"])
+
+        XCTAssertEqual(store.load(), ["/tmp/a", "/tmp/z"])
     }
 
     func testGradleScanSplitsVersionDirectories() throws {
@@ -779,13 +939,15 @@ final class CleanMacNasioTests: XCTestCase {
         let viewModel = ContentViewModel(
             cleanerService: service,
             bookmarkStore: FakeBookmarkStore(url: URL(fileURLWithPath: "/tmp/ignored-home")),
-            exclusionStore: FakeExclusionStore(paths: ["/tmp/restored-home/keep"])
+            exclusionStore: FakeExclusionStore(paths: ["/tmp/restored-home/keep"]),
+            customTargetStore: FakeCustomTargetStore(paths: ["/tmp/restored-home/custom"])
         )
 
         viewModel.restoreSavedState()
 
         XCTAssertEqual(viewModel.homeDirectoryURL, expectedHome)
         XCTAssertEqual(viewModel.excludedPaths, ["/tmp/restored-home/keep"])
+        XCTAssertEqual(viewModel.customTargetPaths, ["/tmp/restored-home/custom"])
         XCTAssertTrue(viewModel.scanEntries.isEmpty)
         XCTAssertEqual(service.scanCallCount, 0)
         XCTAssertNil(service.lastHomeDirectoryURL)
@@ -825,6 +987,65 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertEqual(viewModel.excludedPaths, [])
         XCTAssertEqual(exclusionStore.savedPathsHistory, [["/tmp/home/keep"], []])
         XCTAssertEqual(service.scanCallCount, 2)
+    }
+
+    @MainActor
+    func testViewModelAddRecommendedCacheDirectoriesPersistsAndDedupes() {
+        let home = URL(fileURLWithPath: "/tmp/home", isDirectory: true)
+        let recommendationPath = home.appendingPathComponent("Library/Caches/Discord", isDirectory: true)
+        let service = FakeJunkCleaningService(scanEntries: [])
+        let customTargetStore = FakeCustomTargetStore(paths: [])
+        let viewModel = ContentViewModel(
+            cleanerService: service,
+            bookmarkStore: FakeBookmarkStore(url: home),
+            exclusionStore: FakeExclusionStore(paths: []),
+            customTargetStore: customTargetStore,
+            homeDirectoryURL: home
+        )
+
+        viewModel.addRecommendedCacheDirectories([recommendationPath])
+        viewModel.addRecommendedCacheDirectories([recommendationPath])
+
+        XCTAssertEqual(viewModel.customTargetPaths, [recommendationPath.path])
+        XCTAssertEqual(customTargetStore.savedPathsHistory, [[recommendationPath.path]])
+        XCTAssertEqual(service.scanCallCount, 1)
+    }
+
+    @MainActor
+    func testViewModelCustomTargetPersistsRescansAndStaysUnselected() {
+        let home = URL(fileURLWithPath: "/tmp/home", isDirectory: true)
+        let customTarget = home.appendingPathComponent("Library/Logs/CustomApp", isDirectory: true)
+        let customEntry = JunkScanEntry(
+            location: .customCleanupTarget,
+            directoryURLs: [customTarget],
+            totalSize: 64,
+            fileCount: 1,
+            errorMessage: nil,
+            previewItems: [],
+            excludedItemsCount: 0
+        )
+        let service = FakeJunkCleaningService(scanEntries: [], customTargetEntries: [customEntry])
+        let customTargetStore = FakeCustomTargetStore(paths: [])
+        let viewModel = ContentViewModel(
+            cleanerService: service,
+            bookmarkStore: FakeBookmarkStore(url: home),
+            exclusionStore: FakeExclusionStore(paths: []),
+            customTargetStore: customTargetStore,
+            homeDirectoryURL: home
+        )
+
+        viewModel.addCustomTarget(customTarget)
+
+        XCTAssertEqual(viewModel.customTargetPaths, [customTarget.path])
+        XCTAssertEqual(customTargetStore.savedPathsHistory, [[customTarget.path]])
+        XCTAssertEqual(service.customTargetScanCallCount, 1)
+        XCTAssertEqual(service.lastCustomTargetDirectories, [customTarget])
+        XCTAssertFalse(viewModel.isSelected(customEntry.id))
+
+        viewModel.removeCustomTarget(customTarget.path)
+
+        XCTAssertEqual(viewModel.customTargetPaths, [])
+        XCTAssertEqual(customTargetStore.savedPathsHistory, [[customTarget.path], []])
     }
 
     @MainActor
@@ -887,18 +1108,20 @@ final class CleanMacNasioTests: XCTestCase {
         let first = makeScanEntry(location: .caches, home: home, totalSize: 100, fileCount: 1)
         let second = makeScanEntry(location: .logs, home: home, totalSize: 200, fileCount: 2)
         let zero = makeScanEntry(location: .trash, home: home, totalSize: 0, fileCount: 0)
+        let custom = makeScanEntry(location: .customCleanupTarget, home: home, totalSize: 50, fileCount: 1)
         let viewModel = ContentViewModel(
             cleanerService: FakeJunkCleaningService(scanEntries: []),
             bookmarkStore: FakeBookmarkStore(url: home),
             exclusionStore: FakeExclusionStore(paths: []),
             homeDirectoryURL: home,
-            scanEntries: [first, second, zero]
+            scanEntries: [first, second, zero, custom]
         )
 
         viewModel.selectAllDetected()
         XCTAssertTrue(viewModel.isSelected(first.id))
         XCTAssertTrue(viewModel.isSelected(second.id))
         XCTAssertFalse(viewModel.isSelected(zero.id))
+        XCTAssertFalse(viewModel.isSelected(custom.id))
         XCTAssertEqual(viewModel.selectedTotalSize, 300)
         XCTAssertEqual(viewModel.selectedCategoryCount, 2)
 
@@ -934,19 +1157,56 @@ final class CleanMacNasioTests: XCTestCase {
         XCTAssertFalse(viewModel.showArchiveCleanConfirmation)
         XCTAssertEqual(service.cleanCallCount, 1)
     }
+
+    @MainActor
+    func testViewModelRequiresConfirmationForCustomTargetClean() {
+        let home = URL(fileURLWithPath: "/tmp/home", isDirectory: true)
+        let customEntry = makeScanEntry(location: .customCleanupTarget, home: home, totalSize: 120, fileCount: 1)
+        let service = FakeJunkCleaningService(
+            scanEntries: [],
+            cleanSummary: JunkCleanSummary(results: [
+                JunkCleanEntryResult(location: .customCleanupTarget, deletedItems: 1, freedSize: 120, errors: [])
+            ])
+        )
+        let viewModel = ContentViewModel(
+            cleanerService: service,
+            bookmarkStore: FakeBookmarkStore(url: home),
+            exclusionStore: FakeExclusionStore(paths: []),
+            customTargetStore: FakeCustomTargetStore(paths: []),
+            homeDirectoryURL: home,
+            scanEntries: [customEntry]
+        )
+
+        viewModel.toggleSelection(for: customEntry.id)
+        viewModel.cleanSelected()
+        XCTAssertTrue(viewModel.showCustomTargetCleanConfirmation)
+        XCTAssertEqual(service.cleanCallCount, 0)
+
+        viewModel.confirmCleanSelectedIncludingCustomTargets()
+        XCTAssertFalse(viewModel.showCustomTargetCleanConfirmation)
+        XCTAssertEqual(service.cleanCallCount, 1)
+    }
 }
 
 private final class FakeJunkCleaningService: @unchecked Sendable, JunkCleaningServicing {
     private let scanEntries: [JunkScanEntry]
+    private let customTargetEntries: [JunkScanEntry]
     private let cleanSummary: JunkCleanSummary
     private(set) var lastExcludedPaths: Set<String> = []
     private(set) var lastHomeDirectoryURL: URL?
     private(set) var lastCleanEntries: [JunkScanEntry] = []
+    private(set) var lastCustomTargetDirectories: [URL] = []
     private(set) var scanCallCount = 0
+    private(set) var customTargetScanCallCount = 0
     private(set) var cleanCallCount = 0
 
-    init(scanEntries: [JunkScanEntry], cleanSummary: JunkCleanSummary = JunkCleanSummary(results: [])) {
+    init(
+        scanEntries: [JunkScanEntry],
+        customTargetEntries: [JunkScanEntry] = [],
+        cleanSummary: JunkCleanSummary = JunkCleanSummary(results: [])
+    ) {
         self.scanEntries = scanEntries
+        self.customTargetEntries = customTargetEntries
         self.cleanSummary = cleanSummary
     }
 
@@ -955,6 +1215,19 @@ private final class FakeJunkCleaningService: @unchecked Sendable, JunkCleaningSe
         lastHomeDirectoryURL = homeDirectory
         lastExcludedPaths = excludedPaths
         return scanEntries
+    }
+
+    func scanCustomTargets(
+        directories: [URL],
+        homeDirectory: URL,
+        excludedPaths: Set<String>,
+        shouldCancel: @escaping @Sendable () -> Bool
+    ) -> [JunkScanEntry] {
+        customTargetScanCallCount += 1
+        lastCustomTargetDirectories = directories
+        lastHomeDirectoryURL = homeDirectory
+        lastExcludedPaths = excludedPaths
+        return customTargetEntries
     }
 
     func clean(entries: [JunkScanEntry], excludedPaths: Set<String>) -> JunkCleanSummary {
@@ -981,6 +1254,23 @@ private struct FakeBookmarkStore: SecurityScopedBookmarkStoring {
 }
 
 private final class FakeExclusionStore: ExclusionStoring {
+    let paths: [String]
+    private(set) var savedPathsHistory: [[String]] = []
+
+    init(paths: [String]) {
+        self.paths = paths
+    }
+
+    func load() -> [String] {
+        paths
+    }
+
+    func save(_ paths: [String]) {
+        savedPathsHistory.append(paths)
+    }
+}
+
+private final class FakeCustomTargetStore: CustomTargetStoring {
     let paths: [String]
     private(set) var savedPathsHistory: [[String]] = []
 

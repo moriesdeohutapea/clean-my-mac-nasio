@@ -8,35 +8,16 @@ import Foundation
 @MainActor
 final class ContentViewModel: ObservableObject {
     nonisolated private static let activeScanLocations: [JunkLocation] = [
-        .caches,
-        .xcodeDerivedData,
-        .xcodeArchives,
-        .cocoaPodsCaches,
-        .swiftPMCaches,
-        .npmCaches,
-        .yarnCaches,
-        .pnpmStore,
-        .mavenCaches,
-        .ivyCaches,
-        .pipCaches,
-        .cargoCaches,
-        .dockerCaches,
-        .poetryPipenvCaches,
-        .goCaches,
-        .rubyBundlerCaches,
-        .kubernetesHelmCaches,
-        .androidStudioCaches,
-        .gradleCaches,
-        .flutterCaches,
-        .homebrewCaches,
-        .nixCaches,
-        .trash
+        .logs,
+        .robloxCaches,
+        .whatsAppCaches
     ]
 
     @Published var homeDirectoryURL: URL?
     @Published var scanEntries: [JunkScanEntry]
     @Published var selectedEntryIDs: Set<String>
     @Published var excludedPaths: [String]
+    @Published var customTargetPaths: [String]
     @Published var logMessage: String
     @Published var scanProgressMessage: String
     @Published var scanProgressDetail: String
@@ -44,13 +25,16 @@ final class ContentViewModel: ObservableObject {
     @Published var cleanProgressMessage: String
     @Published var cleanProgressDetail: String
     @Published var cleanProgressFraction: Double
+    @Published var detectedAppCacheRecommendations: [JunkCleanerService.AppCacheRecommendation]
     @Published var isScanning = false
     @Published var isCleaning = false
     @Published var showArchiveCleanConfirmation = false
+    @Published var showCustomTargetCleanConfirmation = false
 
     private let cleanerService: JunkCleaningServicing
     private let bookmarkStore: SecurityScopedBookmarkStoring
     private let exclusionStore: ExclusionStoring
+    private let customTargetStore: CustomTargetStoring
     private let performAsyncScan: Bool
     private let performAsyncClean: Bool
     private let scanQueue = DispatchQueue(label: "CleanMacNasio.scan.queue", qos: .userInitiated)
@@ -62,10 +46,12 @@ final class ContentViewModel: ObservableObject {
         cleanerService: JunkCleaningServicing = JunkCleanerService(),
         bookmarkStore: SecurityScopedBookmarkStoring = SecurityScopedBookmarkStore(),
         exclusionStore: ExclusionStoring = ExclusionStore(),
+        customTargetStore: CustomTargetStoring = CustomTargetStore(),
         homeDirectoryURL: URL? = nil,
         scanEntries: [JunkScanEntry] = [],
         selectedEntryIDs: Set<String> = [],
         excludedPaths: [String] = [],
+        customTargetPaths: [String] = [],
         logMessage: String = "",
         scanProgressMessage: String = "",
         scanProgressDetail: String = "",
@@ -79,10 +65,13 @@ final class ContentViewModel: ObservableObject {
         self.cleanerService = cleanerService
         self.bookmarkStore = bookmarkStore
         self.exclusionStore = exclusionStore
+        self.customTargetStore = customTargetStore
         self.homeDirectoryURL = homeDirectoryURL
         self.scanEntries = scanEntries
         self.selectedEntryIDs = selectedEntryIDs
         self.excludedPaths = excludedPaths
+        self.detectedAppCacheRecommendations = []
+        self.customTargetPaths = customTargetPaths
         self.logMessage = logMessage
         self.scanProgressMessage = scanProgressMessage
         self.scanProgressDetail = scanProgressDetail
@@ -142,6 +131,7 @@ final class ContentViewModel: ObservableObject {
 
     func restoreSavedState() {
         excludedPaths = exclusionStore.load()
+        customTargetPaths = customTargetStore.load()
         if homeDirectoryURL == nil {
             homeDirectoryURL = Self.defaultHomeDirectoryURL()
         }
@@ -176,6 +166,65 @@ final class ContentViewModel: ObservableObject {
         scanJunk()
     }
 
+    func addCustomTarget(_ url: URL) {
+        let targetHomeDirectory = homeDirectoryURL ?? Self.defaultHomeDirectoryURL()
+        let normalizedHomePath = JunkCleanerService.normalizePath(targetHomeDirectory.path)
+        let normalizedTargetPath = JunkCleanerService.normalizePath(url.path)
+
+        guard normalizedTargetPath != normalizedHomePath,
+              normalizedTargetPath.hasPrefix(normalizedHomePath + "/") else {
+            logMessage = "Custom target harus berupa subfolder di Home directory."
+            return
+        }
+
+        guard !customTargetPaths.contains(normalizedTargetPath) else { return }
+
+        customTargetPaths.append(normalizedTargetPath)
+        customTargetStore.save(customTargetPaths)
+        logMessage = "Custom target ditambahkan. Target ini tidak dipilih otomatis."
+        scanJunk()
+    }
+
+    func addRecommendedCacheDirectories(_ directories: [URL]) {
+        guard !directories.isEmpty else { return }
+
+        let targetHomeDirectory = homeDirectoryURL ?? Self.defaultHomeDirectoryURL()
+        let normalizedHomePath = JunkCleanerService.normalizePath(targetHomeDirectory.path)
+        var updatedPaths = customTargetPaths
+        var addedPathsCount = 0
+
+        for directory in directories {
+            let normalizedTargetPath = JunkCleanerService.normalizePath(directory.path)
+
+            guard normalizedTargetPath != normalizedHomePath,
+                  normalizedTargetPath.hasPrefix(normalizedHomePath + "/") else {
+                continue
+            }
+            guard !updatedPaths.contains(normalizedTargetPath) else { continue }
+
+            updatedPaths.append(normalizedTargetPath)
+            addedPathsCount += 1
+        }
+
+        guard addedPathsCount > 0 else {
+            logMessage = "Semua path rekomendasi sudah ada di Custom Target."
+            return
+        }
+
+        updatedPaths.sort()
+        customTargetPaths = updatedPaths
+        customTargetStore.save(updatedPaths)
+        logMessage = "\(addedPathsCount) path rekomendasi ditambahkan. Target ini tidak dipilih otomatis."
+        scanJunk()
+    }
+
+    func removeCustomTarget(_ path: String) {
+        customTargetPaths.removeAll { $0 == path }
+        customTargetStore.save(customTargetPaths)
+        logMessage = "Custom target dihapus."
+        scanJunk()
+    }
+
     func requestStopScan() {
         guard isScanning else { return }
         setScanCancellationRequested(true)
@@ -188,19 +237,22 @@ final class ContentViewModel: ObservableObject {
         let targetHomeDirectory = homeDirectoryURL ?? Self.defaultHomeDirectoryURL()
         homeDirectoryURL = targetHomeDirectory
         let currentExcludedPaths = Set(excludedPaths)
+        let currentCustomTargetDirectories = Self.customTargetDirectories(paths: customTargetPaths)
+        let recommendationEntries = JunkCleanerService.detectInstalledAppCacheRecommendations(homeDirectory: targetHomeDirectory)
         setScanCancellationRequested(false)
 
         isScanning = true
         scanProgressMessage = "Preparing scan..."
         scanProgressDetail = ""
         scanProgressFraction = 0
+        detectedAppCacheRecommendations = []
 
         if performAsyncScan {
             let service = cleanerService
             scanQueue.async { [weak self] in
                 let didStart = targetHomeDirectory.startAccessingSecurityScopedResource()
                 let locations = Self.activeScanLocations
-                let totalSteps = locations.count
+                let totalSteps = locations.count + currentCustomTargetDirectories.count
                 var scannedEntries: [JunkScanEntry] = []
                 var cancelled = false
 
@@ -236,23 +288,72 @@ final class ContentViewModel: ObservableObject {
                         self?.scanProgressFraction = Double(stepNumber) / Double(totalSteps)
                     }
                 }
+
+                if !cancelled {
+                    for (index, directory) in currentCustomTargetDirectories.enumerated() {
+                        if self?.shouldCancelScan() == true {
+                            cancelled = true
+                            break
+                        }
+
+                        let stepNumber = locations.count + index + 1
+                        let pathSummary = Self.pathSummary(
+                            directories: [directory],
+                            homeDirectory: targetHomeDirectory
+                        )
+                        Task { @MainActor [weak self] in
+                            self?.scanProgressMessage = "Step \(stepNumber)/\(totalSteps): Custom Target"
+                            self?.scanProgressDetail = pathSummary
+                            self?.scanProgressFraction = Double(stepNumber - 1) / Double(totalSteps)
+                        }
+
+                        let stepEntries = service.scanCustomTargets(
+                            directories: [directory],
+                            homeDirectory: targetHomeDirectory,
+                            excludedPaths: currentExcludedPaths,
+                            shouldCancel: { [weak self] in
+                                self?.shouldCancelScan() ?? false
+                            }
+                        )
+                        scannedEntries.append(contentsOf: stepEntries)
+
+                        Task { @MainActor [weak self] in
+                            self?.scanProgressFraction = Double(stepNumber) / Double(totalSteps)
+                        }
+                    }
+                }
                 if didStart {
                     targetHomeDirectory.stopAccessingSecurityScopedResource()
                 }
 
                 Task { @MainActor [weak self] in
-                    self?.completeScan(scannedEntries, cancelled: cancelled || self?.shouldCancelScan() == true)
+                    self?.completeScan(
+                        scannedEntries,
+                        recommendations: recommendationEntries,
+                        cancelled: cancelled || self?.shouldCancelScan() == true
+                    )
                 }
             }
         } else {
             let scannedEntries = withSecurityScopedAccess(targetHomeDirectory) {
-                cleanerService.scan(
+                let standardEntries = cleanerService.scan(
                     locations: Self.activeScanLocations,
                     homeDirectory: targetHomeDirectory,
                     excludedPaths: currentExcludedPaths
                 )
+                let customEntries = cleanerService.scanCustomTargets(
+                    directories: currentCustomTargetDirectories,
+                    homeDirectory: targetHomeDirectory,
+                    excludedPaths: currentExcludedPaths,
+                    shouldCancel: { false }
+                )
+                return standardEntries + customEntries
             }
-            completeScan(scannedEntries, cancelled: false)
+            completeScan(
+                scannedEntries,
+                recommendations: recommendationEntries,
+                cancelled: false
+            )
         }
     }
 
@@ -260,6 +361,11 @@ final class ContentViewModel: ObservableObject {
         guard !selectedEntries.isEmpty, let homeDirectoryURL else { return }
 
         let entriesToClean = selectedEntries
+        if entriesToClean.contains(where: { $0.location == .customCleanupTarget }) {
+            showCustomTargetCleanConfirmation = true
+            return
+        }
+
         if entriesToClean.contains(where: { $0.location == .xcodeArchives }) {
             showArchiveCleanConfirmation = true
             return
@@ -280,6 +386,20 @@ final class ContentViewModel: ObservableObject {
 
     func cancelCleanSelectedIncludingArchives() {
         showArchiveCleanConfirmation = false
+    }
+
+    func confirmCleanSelectedIncludingCustomTargets() {
+        guard !selectedEntries.isEmpty, let homeDirectoryURL else {
+            showCustomTargetCleanConfirmation = false
+            return
+        }
+
+        showCustomTargetCleanConfirmation = false
+        runClean(entriesToClean: selectedEntries, homeDirectoryURL: homeDirectoryURL)
+    }
+
+    func cancelCleanSelectedIncludingCustomTargets() {
+        showCustomTargetCleanConfirmation = false
     }
 
     private func runClean(entriesToClean: [JunkScanEntry], homeDirectoryURL: URL) {
@@ -360,7 +480,7 @@ final class ContentViewModel: ObservableObject {
     func selectAllDetected() {
         selectedEntryIDs = Set(
             scanEntries
-                .filter { $0.totalSize > 0 }
+                .filter { $0.totalSize > 0 && $0.location != .customCleanupTarget }
                 .map(\.id)
         )
     }
@@ -383,8 +503,13 @@ final class ContentViewModel: ObservableObject {
         return operation()
     }
 
-    private func completeScan(_ scannedEntries: [JunkScanEntry], cancelled: Bool) {
+    private func completeScan(
+        _ scannedEntries: [JunkScanEntry],
+        recommendations: [JunkCleanerService.AppCacheRecommendation],
+        cancelled: Bool
+    ) {
         scanEntries = scannedEntries
+        detectedAppCacheRecommendations = recommendations
         selectedEntryIDs.removeAll()
         let total = scanEntries.reduce(0) { $0 + $1.totalSize }
         if cancelled {
@@ -427,6 +552,14 @@ final class ContentViewModel: ObservableObject {
         }
 
         return "Paths: " + relativePaths.joined(separator: " | ")
+    }
+
+    nonisolated private static func customTargetDirectories(paths: [String]) -> [URL] {
+        paths.map { path in
+            URL(fileURLWithPath: path, isDirectory: true)
+                .standardizedFileURL
+                .resolvingSymlinksInPath()
+        }
     }
 
     nonisolated private static func defaultHomeDirectoryURL() -> URL {
